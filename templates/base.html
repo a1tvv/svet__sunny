@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Свет Сунны🌙✨{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <div class="logo-area">
+                <div class="logo-text">
+                    <span class="brand">Свет Сунны🌙✨</span>
+                </div>
+            </div>
+            <nav class="nav">
+                <a href="{{ links.rinat }}" target="_blank">Ринат Абу Мухаммад</a>
+                <a href="{{ links.abu_yahya }}" target="_blank">Абу Яхья</a>
+                <a href="{{ links.siraj }}" target="_blank">Сирадж Абу Тальха</a>
+            </nav>
+        </div>
+    </header>
+
+<main class="container">
+    <div class="main-layout">
+        
+        <section class="main-feed">
+            {% block content %}
+            {% endblock %}
+        </section>
+
+        <aside class="sidebar">
+            <a href="https://t.me/svettsunny", target='blank'>
+                <div class="side-card profile-card">
+                    <div class="profile-logo">
+                        <i class="fa-solid fa-kaaba"></i>
+                    </div>
+                    <h3>Свет Сунны🌙✨</h3>
+                    <p>Призываем к пониманию первых поколений мусульман.</p>
+                </div>
+            </a>
+
+            <div class="side-card banner-ad">
+                <a href="https://www.youtube.com/watch?v=hBfAewyOYuc">
+                    <img src="{% static 'img/kak_prinyat.jpg' %}" alt="Как принять Ислам?">
+                </a>
+            </div>
+        </aside>
+
+    </div>
+</main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <div class="footer-logo">SVET SUNNY</div>
+                <p>© Svet Sunny | 2026. Все права защищены</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Сира Пророка Мухаммада ﷺ{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/sira.css' %}">
+{% endblock %}
+
+{% block content %}
+<article class="article-card">
+    
+    <h1 class="article-title">Сира Пророка Мухаммада ﷺ</h1>
+    
+    <div class="article-image">
+        <img src="{% static 'img/sira.jpg' %}" alt="Преграды">
+    </div>
+
+    <div class="article-text">
+        <p>
+            С именем Аллаха Милостивого, Милующего!
+            🔈Серия аудио лекций на тему «История Пророка Мухаммада, да благословит его Аллах и приветствует. Запись сделана в 2001-м году, полностью переработана и отредактирована.
+        </p>
+    </div>
+
+    <div class="audio-section">
+
+        <a href="https://t.me/istoriya_proroka" class="btn-download">Ссылка на Tekegram канал</a>
+        <a href="https://youtube.com/playlist?list=PLRFJeQnBC-ymqYjYb6OnoxeGxJQdoxyFO&si=zhqG0wjnLaqtnAER" class="btn-download">Ссылка на плейлист в YouTube</a>
+
+        <div class="audio-item">
+            <div class="audio-info">
+                <p>1. Вступление. Положение арабов до Ислама.</p>
+            </div>
+            <audio controls src="{% static 'audio/sira_001.mp3' %}" class="sira-audio"></audio>
+        </div>
+
+        <div class="audio-item">
+            <div class="audio-info">
+                <p>2. История Ибрахима, мир ему и Хаджар.</p>
+            </div>
+            <audio controls src="{% static 'audio/sira_002.mp3' %}" class="sira-audio"></audio>
+        </div>
+
+        <div class="audio-item">
+            <div class="audio-info">
+                <p>3. История Хаджар и источника воды Зам-зам.</p>
+            </div>
+            <audio controls src="{% static 'audio/sira_003.mp3' %}" class="sira-audio"></audio>
+        </div>
+
+        <div class="audio-item">
+            <div class="audio-info">
+                <p>4. История распространения арабов по ближнему востоку. История прибытия племени Джурхум в Мекку</p>
+            </div>
+            <audio controls src="{% static 'audio/sira_004.mp3' %}" class="sira-audio"></audio>
+        </div>
+
+        <div class="audio-item">
+            <div class="audio-info">
+                <p>5. История Ибрахима и жен Исма’иля.</p>
+            </div>
+            <audio controls src="{% static 'audio/sira_005.mp3' %}" class="sira-audio"></audio>
+        </div>
+
+        <div class="audio-item">
+            <div class="audio-info">
+                <p>6. Строительство Каабы Ибрахимом и Исма’илем</p>
+            </div>
+            <audio controls src="{% static 'audio/sira_006.mp3' %}" class="sira-audio"></audio>
+        </div>
+
+        <div class="audio-item">
+            <div class="audio-info">
+                <p>7. Начало распространения многобожия среди арабов.</p>
+            </div>
+            <audio controls src="{% static 'audio/sira_007.mp3' %}" class="sira-audio"></audio>
+        </div>
+
+        <div class="audio-item">
+            <div class="audio-info">
+                <p>8. История того, как распространился иудаизм на Аравийском полуострове.</p>
+            </div>
+            <audio controls src="{% static 'audio/sira_008.mp3' %}" class="sira-audio"></audio>
+        </div>
+
+    </div>
+
+</article>
+{% endblock %}

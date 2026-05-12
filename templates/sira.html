@@ -19,8 +19,13 @@
     </div>
 
     <div class="audio-section">
-        <a href="..." class="btn-download">Telegram</a>
-        <a href="..." class="btn-download">YouTube</a>
+        <a href="https://t.me/istoriya_proroka" class="btn-download" target='blank'>
+            <i class="fa-brands fa-telegram"> </i> Telegram
+        </a>
+
+        <a href="https://youtube.com/playlist?list=PLRFJeQnBC-ymqYjYb6OnoxeGxJQdoxyFO&si=Ewf_F11u7Fy3m97W" class="btn-download" target='blank'>
+            <i class="fa-brands fa-youtube"> </i> YouTube
+        </a>
 
         {% for track in data.tracks %}
             <div class="audio-item">
@@ -50,7 +55,7 @@
 
     <div class="control-questions-card">
         <div class="card-header">
-            <span class="icon">📕</span>
+            <span class="icon">📘</span>
             <h3>Контрольные вопросы (Часть {{ page_obj.number }})</h3>
         </div>
         <ol class="questions-list">

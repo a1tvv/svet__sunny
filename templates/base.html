@@ -10,6 +10,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    
     <header class="header">
         <div class="container header-content">
             <div class="logo-area">
@@ -17,11 +18,12 @@
                     <span class="brand">Свет Сунны🌙✨</span>
                 </div>
             </div>
+            
             <nav class="nav">
-                <a href="{{ links.rinat }}" target="_blank">Ринат Абу Мухаммад</a>
-                <a href="{{ links.abu_yahya }}" target="_blank">Абу Яхья</a>
-                <a href="{{ links.siraj }}" target="_blank">Сирадж Абу Тальха</a>
+                <a href="{% url 'index'%}"> Главная</a>
+                <a href="https://t.me/svettsunny">Свет Сунны🌙✨</a>
             </nav>
+
         </div>
     </header>
 
@@ -34,21 +36,142 @@
         </section>
 
         <aside class="sidebar">
+
             <a href="https://t.me/svettsunny", target='blank'>
                 <div class="side-card profile-card">
                     <div class="profile-logo">
                         <i class="fa-solid fa-kaaba"></i>
                     </div>
-                    <h3>Свет Сунны🌙✨</h3>
-                    <p>Призываем к пониманию первых поколений мусульман.</p>
+                    <p>Призываем к пониманию первых поколений мусульман. <br><br>(Перейти в Telegram канал)</p>
                 </div>
-            </a>
 
-            <div class="side-card banner-ad">
-                <a href="https://www.youtube.com/watch?v=hBfAewyOYuc">
-                    <img src="{% static 'img/kak_prinyat.jpg' %}" alt="Как принять Ислам?">
-                </a>
-            </div>
+                <div class="side-card banner-ad">
+                    <a href="https://www.youtube.com/watch?v=hBfAewyOYuc">
+                        <img src="{% static 'img/kak_prinyat.jpg' %}" alt="Как принять Ислам?">
+                    </a>
+                </div>
+
+                <div class="tg-chanels">
+
+                    <h3>Ринат Абу Мухаммад</h3>
+        
+                    <a href="https://t.me/toislam" class="tg-chanel-item">
+                        <div class="tg-icon-wrapper">
+                            <img src="{% static 'img/to_islam.jpg' %}" alt="Logo">
+                        </div>
+                        <span class="tg-label">К Исламу</span>
+                    </a>
+
+                    <a href="https://t.me/tolkovaniya_imen" class="tg-chanel-item">
+                        <div class="tg-icon-wrapper">
+                            <img src="{% static 'img/imena-allaha.jpg' %}" alt="Logo">
+                        </div>
+                        <span class="tg-label">Толкование имен Аллаха</span>
+                    </a>
+
+                    <a href="https://t.me/izuchaem_tauhid" class="tg-chanel-item">
+                        <div class="tg-icon-wrapper">
+                            <img src="{% static 'img/tauhid.jpg' %}" alt="Logo">
+                        </div>
+                        <span class="tg-label">Изучаем Еденбожие / Таухид</span>
+                    </a>
+
+                    <a href="https://t.me/toislamdata" class="tg-chanel-item" id='red'>
+                        <div class="tg-icon-wrapper">
+                            <img src="{% static 'img/video-to-islam.jpg' %}" alt="Logo">
+                        </div>
+                        <span class="tg-label">Видео "К Исламу"</span>
+                    </a>
+
+                    <a href="https://t.me/izuchaem_sunnu" class="tg-chanel-item" id='violet'>
+                        <div class="tg-icon-wrapper">
+                            <img src="{% static 'img/izuchaem-sunnu.jpg' %}" alt="Logo">
+                        </div>
+                        <span class="tg-label">Изучаем Сунну</span>
+                    </a>
+
+                    <a href="https://t.me/sunna_pobujdaee" class="tg-chanel-item" id='violet'>
+                        <div class="tg-icon-wrapper">
+                            <img src="{% static 'img/sunna-pobuzhdaet.jpg' %}" alt="Logo">
+                        </div>
+                        <span class="tg-label">Сунна побуждает хорошо относиться к жене</span>
+                    </a>
+
+                    <a href="https://t.me/riyadu_salihin" class="tg-chanel-item" id='yellow'>
+                        <div class="tg-icon-wrapper">
+                            <img src="{% static 'img/adabulmufrad.jpg' %}" alt="Logo">
+                        </div>
+                        <span class="tg-label">Книга благонравия</span>
+                    </a>
+
+                    <a href="https://t.me/kniga_o_nikahe" class="tg-chanel-item" id='green'>
+                        <div class="tg-icon-wrapper">
+                            <img src="{% static 'img/nikah.jpg' %}" alt="Logo">
+                        </div>
+                        <span class="tg-label">Все о Браке и Разводе</span>
+                    </a>
+
+                    <a href="https://t.me/ochishenie_serdec" class="tg-chanel-item" id='white'>
+                        <div class="tg-icon-wrapper">
+                            <img src="{% static 'img/ochishenie.jpg' %}" alt="Logo">
+                        </div>
+                        <span class="tg-label">Очищеие сердец</span>
+                    </a>
+
+
+                    <h3>Сирадж Абу Тальха</h3>
+
+                    <a href="https://t.me/sirajabutalha" class="tg-chanel-item" id='black'>
+                        <div class="tg-icon-wrapper">
+                            <img src="{% static 'img/siradj.jpg' %}" alt="Logo">
+                        </div>
+                        <span class="tg-label">Сирадж Абу Тальха</span>
+                    </a>
+
+                    <a href="https://t.me/riyadu_salihin" class="tg-chanel-item" id='black'>
+                        <div class="tg-icon-wrapper">
+                            <img src="{% static 'img/sady-pravednyh.jpg' %}" alt="Logo">
+                        </div>
+                        <span class="tg-label">Сады праиведных</span>
+                    </a>
+
+                    <a href="https://t.me/video_siraj" class="tg-chanel-item" id='emerald'>
+                        <div class="tg-icon-wrapper">
+                            <img src="{% static 'img/full-siradj.jpg' %}" alt="Logo">
+                        </div>
+                        <span class="tg-label">Полные уроки Сирадж Абу Тальха</span>
+                    </a>
+
+                    <h3>Абу Яхья Крымский</h3>
+
+                     <a href="https://t.me/abuyahya_net" class="tg-chanel-item" id='white'>
+                        <div class="tg-icon-wrapper">
+                            <img src="{% static 'img/abu-yahiya.jpg' %}" alt="Logo">
+                        </div>
+                        <span class="tg-label">Абу Яхья Крымский</span>
+                    </a>
+
+                    <a href="https://t.me/abu_yahya_ob_islame" class="tg-chanel-item" id='white'>
+                        <div class="tg-icon-wrapper">
+                            <img src="{% static 'img/abu-yahiya-polza.jpg' %}" alt="Logo">
+                        </div>
+                        <span class="tg-label">Пользы из уроков Абу Яхья Крымский</span>
+                    </a>
+
+                    <h3>Telegram канал Свет Сунны🌙✨</h3>
+
+                    <a href="https://t.me/svettsunny" class="tg-chanel-item" id='black'>
+                        <div class="tg-icon-wrapper">
+                            <img src="{% static 'img/favicon.jpg' %}" alt="Logo">
+                        </div>
+                        <span class="tg-label">Свет Сунны🌙✨</span>
+                    </a>
+
+
+                </div>
+
+            </a>
+            
         </aside>
 
     </div>
@@ -57,10 +180,11 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-bottom">
-                <div class="footer-logo">SVET SUNNY</div>
-                <p>© Svet Sunny | 2026. Все права защищены</p>
+                <p>© Свет Сунны  ١٤٤٧  2026. 
+                <br> По всем вопросам <a href="https://t.me/abdurtwhd" target="_blank">писать сюда</a></p>
             </div>
         </div>
     </footer>
+
 </body>
 </html>

@@ -57,7 +57,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'main.wsgi.application'
 
 # Database
-# ВАЖНО: Убедись, что db.sqlite3 залит на GitHub, иначе Vercel выдаст ошибку 500
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -77,9 +76,11 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# --- СТАТИКА И ХРАНИЛИЩЕ (DigitalOcean Spaces) ---
 
 STATIC_URL = '/static/'
+# Это поможет WhiteNoise правильно собирать файлы на Vercel
+WHITENOISE_KEEP_ONLY_HASHED_FILES = True
+
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 

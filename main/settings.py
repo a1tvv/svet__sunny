@@ -13,7 +13,7 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 if 'VERCEL' in os.environ:
     DEBUG = False
 
-ALLOWED_HOSTS = ['nurassunnah.vercel.app', 'svet-sunny.vercel.app', '.vercel.app', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['nurassunnah.vercel.app', '.vercel.app', '127.0.0.1', 'localhost']
 
 INSTALLED_APPS = [
     'django.contrib.admin',

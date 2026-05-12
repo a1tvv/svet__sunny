@@ -9,6 +9,11 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
+import os
+from dotenv import load_dotenv
+
+# Загружаем переменные из .env
+load_dotenv()
 
 from pathlib import Path
 
@@ -32,6 +37,7 @@ ALLOWED_HOSTS = ['svet-sunny.vercel.app', '.vercel.app', '127.0.0.1', 'localhost
 # Application definition
 
 INSTALLED_APPS = [
+    'storages',
     'content',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -113,15 +119,60 @@ USE_I18N = True
 
 USE_TZ = True
 
+import os
+from dotenv import load_dotenv
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
+load_dotenv()
 
-STATIC_URL = 'static/'
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+# ... (всё до USE_TZ = True оставляем) ...
+
+USE_TZ = True
+
+# --- Все что после USE_TZ = True ---
+
+
+# --- НАСТРОЙКИ ХРАНИЛИЩА ---
+
+# Забираем данные из .env (убедись, что в файле .env ключи написаны именно так)
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME', 'svetsunny')
+AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'ams3')
+AWS_S3_ENDPOINT_URL = os.getenv('AWS_S3_ENDPOINT_URL', 'https://ams3.digitaloceanspaces.com')
+
+# Важные параметры для DigitalOcean
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.{AWS_S3_REGION_NAME}.digitaloceanspaces.com'
+AWS_S3_SIGNATURE_VERSION = 's3v4'
+AWS_QUERYSTRING_AUTH = False
+AWS_DEFAULT_ACL = 'public-read' # Или None, если хочешь приватные файлы
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage", # Для новых версий django-storages
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles" # Папка, куда соберутся файлы при билде
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+# Медиа-файлы будут грузиться в S3
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+
+
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

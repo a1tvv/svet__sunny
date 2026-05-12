@@ -11,7 +11,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-default-key')
 # На Vercel DEBUG будет выключен автоматически
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 if 'VERCEL' in os.environ:
-    DEBUG = False
+    DEBUG = True
 
 ALLOWED_HOSTS = ['nurassunnah.vercel.app', '.vercel.app', '127.0.0.1', 'localhost']
 

@@ -124,14 +124,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
 
 # ... (всё до USE_TZ = True оставляем) ...
 
@@ -142,34 +134,37 @@ USE_TZ = True
 
 # --- НАСТРОЙКИ ХРАНИЛИЩА ---
 
-# Забираем данные из .env (убедись, что в файле .env ключи написаны именно так)
+# Настройки статики
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Настройки S3 (DigitalOcean)
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME', 'svetsunny')
-AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'ams3')
-AWS_S3_ENDPOINT_URL = os.getenv('AWS_S3_ENDPOINT_URL', 'https://ams3.digitaloceanspaces.com')
-
-# Важные параметры для DigitalOcean
+AWS_STORAGE_BUCKET_NAME = 'svetsunny'
+AWS_S3_REGION_NAME = 'ams3'
+AWS_S3_ENDPOINT_URL = 'https://ams3.digitaloceanspaces.com'
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.{AWS_S3_REGION_NAME}.digitaloceanspaces.com'
-AWS_S3_SIGNATURE_VERSION = 's3v4'
+
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_DEFAULT_ACL = 'public-read'
 AWS_QUERYSTRING_AUTH = False
-AWS_DEFAULT_ACL = 'public-read' # Или None, если хочешь приватные файлы
 
 STORAGES = {
     "default": {
-        "BACKEND": "storages.backends.s3.S3Storage", # Для новых версий django-storages
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
 
+# Чтобы избежать ошибок с БД на Vercel (временный костыль для запуска)
 if 'VERCEL' in os.environ:
     DEBUG = False
-
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Медиа-файлы будут грузиться в S3
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'

@@ -16,6 +16,7 @@ body {
 
 a{
     text-decoration: none;
+    color: #222;
 }
 
 .container {
@@ -24,16 +25,17 @@ a{
     padding: 0 20px;
 }
 
-/* Header */
-.header {
-    background: #fff;
-    padding: 20px 0;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    margin-bottom: 20px;
-}
 
-.header p:hover{
-    color: var(--accent-blue);
+/* Обновленный Header */
+.header {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px); /* Эффект размытия фона */
+    padding: 12px 0;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+    position: sticky; /* Шапка липнет к верху */
+    top: 0;
+    z-index: 1000;
+    margin-bottom: 40px;
 }
 
 .header-content {
@@ -43,47 +45,70 @@ a{
 }
 
 .brand {
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.nav a {
-    text-decoration: none;
+    font-size: 1.4rem;
+    font-weight: 800;
     color: var(--text-main);
-    margin-left: 20px;
-    font-size: 0.9rem;
-    transition: color 0.3s;
+    letter-spacing: -0.5px;
+    transition: transform 0.2s;
+    display: inline-block;
 }
 
+.brand:hover {
+    transform: scale(1.02);
+}
 
+/* Навигация */
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-link {
+    color: var(--text-main);
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 8px 16px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    background: rgba(0, 162, 236, 0.08); /* Светло-голубой фон при наведении */
+    color: var(--accent-blue);
+}
+
+.nav-link.active {
+    color: var(--accent-blue);
+}
+
+.tg-link {
+    background: var(--accent-blue);
+    color: #fff !important;
+}
+
+.tg-link:hover {
+    background: #008ecc;
+    box-shadow: 0 4px 12px rgba(0, 162, 236, 0.3);
+}
+
+/* Адаптивность для мобилок */
 @media (max-width: 600px) {
     .header {
-        padding: 15px 0;
+        padding: 10px 0;
     }
     
-    .brand{
-        margin-bottom: 20px;
+    .brand {
+        font-size: 1.2rem;
     }
 
-    .header-content {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .nav {
-        justify-content: center;
-        width: 100%;
-    }
-
-    .nav a {
-        margin: 0 5px;
-        font-size: 0.8rem;
-    }
-    
-    .feed-grid {
-        grid-template-columns: 1fr;
+    .nav-link {
+        padding: 6px 12px;
+        font-size: 0.85rem;
     }
 }
+
+
 
 
 /* Макет: Лента + Сайдбар */
@@ -267,6 +292,10 @@ a{
 
 #yellow{
     background-color: #f8c512;
+}
+
+#page{
+    background-color: #e3e3e3;
 }
 
 /* Footer */

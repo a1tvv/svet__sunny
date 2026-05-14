@@ -16,6 +16,7 @@
     
     <header class="header">
         <div class="container header-content">
+
             <div class="left-group">
                 <button class="menu-toggle" id="menu-btn">
                     <i class="fas fa-bars"></i>
@@ -24,6 +25,14 @@
                     <span class="brand">Свет Сунны🌙✨</span>
                 </a>
             </div>
+
+            <div class="right-group">
+                <a href="{% url 'index'%}" class="nav-link active">Главная</a>
+                <a href="https://t.me/svettsunny" class="nav-link tg-link">
+                    Наш Telegram <i class="fab fa-telegram"></i>
+                </a>
+            </div>
+
         </div>
 
     </header>
@@ -34,10 +43,6 @@
         <button class="close-menu" id="close-btn">&times;</button>
         
         <div class="nav-scroll-content">
-            <a href="{% url 'index'%}" class="nav-link active">Главная</a>
-            <a href="https://t.me/svettsunny" class="nav-link tg-link">
-                Наш Telegram <i class="fab fa-telegram"></i>
-            </a>
 
             <div class="mobile-only-links">
                 <hr>

@@ -288,6 +288,18 @@ a {
 
 /* ========== АДАПТИВ (max 600px) ========== */
 @media (max-width: 600px) {
+
+    .header .right-group {
+    display: flex !important;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    }
+
+    .header .right-group .nav-link {
+        white-space: nowrap;
+    }
+
     /* Скрываем десктопную навигацию */
     .header .nav {
         display: none;

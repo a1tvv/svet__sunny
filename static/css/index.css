@@ -1,0 +1,14 @@
+/* Желтая карточка */
+.card#yellow {
+    background-color: #f8c512 !important;
+}
+
+.card#yellow .card-body {
+    background-color: #f8c512;
+}
+
+.card#yellow .card-date,
+.card#yellow h2,
+.card#yellow p {
+    color: #333;
+}

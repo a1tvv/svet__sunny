@@ -10,11 +10,14 @@ def index(request):
         }
     }
     return render(request, 'index.html', sheikh)
+
+def tafsir(request):
+    return render(request,  'tafsir.html')
+
 from django.core.paginator import Paginator
 from django.shortcuts import render
 
 def sira(request):
-    # Каждая страница — это один элемент списка (словарь)
     pages_data = [
         {
             "id": 1,

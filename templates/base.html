@@ -16,18 +16,154 @@
     
     <header class="header">
         <div class="container header-content">
-            <a href="{% url 'index'%}" class="logo-area">
-                <span class="brand">Свет Сунны🌙✨</span>
-            </a>
-            
-            <nav class="nav">
-                <a href="{% url 'index'%}" class="nav-link active">Главная</a>
-                <a href="https://t.me/svettsunny" class="nav-link tg-link">
-                    Наш Telegram <i class="fab fa-telegram"></i>
+            <div class="left-group">
+                <button class="menu-toggle" id="menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="{% url 'index'%}" class="logo-area">
+                    <span class="brand">Свет Сунны🌙✨</span>
                 </a>
-            </nav>
+            </div>
         </div>
+
     </header>
+
+     <!-- Навигация (Sidebar) вынесена ЗА ПРЕДЕЛЫ header, чтобы фиксироваться на весь экран -->
+    <nav class="mobile-nav" id="nav-menu">
+
+        <button class="close-menu" id="close-btn">&times;</button>
+        
+        <div class="nav-scroll-content">
+            <a href="{% url 'index'%}" class="nav-link active">Главная</a>
+            <a href="https://t.me/svettsunny" class="nav-link tg-link">
+                Наш Telegram <i class="fab fa-telegram"></i>
+            </a>
+
+            <div class="mobile-only-links">
+                <hr>
+                <h3>Ринат Абу Мухаммад</h3>
+            
+                        <a href="https://t.me/toislam" class="tg-chanel-item">
+                            <div class="tg-icon-wrapper">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/to_islam.jpg" alt="Logo">
+                            </div>
+                            <span class="tg-label">К Исламу</span>
+                        </a>
+
+                        <a href="https://t.me/tolkovaniya_imen" class="tg-chanel-item">
+                            <div class="tg-icon-wrapper">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/imena-allaha.jpg" alt="Logo">
+                            </div>
+                            <span class="tg-label">Толкование имен Аллаха</span>
+                        </a>
+
+                        <a href="https://t.me/izuchaem_tauhid" class="tg-chanel-item">
+                            <div class="tg-icon-wrapper">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/tauhid.jpg" alt="Logo">
+                            </div>
+                            <span class="tg-label">Изучаем Еденбожие / Таухид</span>
+                        </a>
+
+                        <a href="https://t.me/toislamdata" class="tg-chanel-item" id='red'>
+                            <div class="tg-icon-wrapper">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/video-to-islam.jpg" alt="Logo">
+                            </div>
+                            <span class="tg-label">Видео "К Исламу"</span>
+                        </a>
+
+                        <a href="https://t.me/izuchaem_sunnu" class="tg-chanel-item" id='violet'>
+                            <div class="tg-icon-wrapper">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/izuchaem-sunnu.jpg" alt="Logo">
+                            </div>
+                            <span class="tg-label">Изучаем Сунну</span>
+                        </a>
+
+                        <a href="https://t.me/sunna_pobujdaee" class="tg-chanel-item" id='violet'>
+                            <div class="tg-icon-wrapper">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/sunna-pobuzhdaet.jpg" alt="Logo">
+                            </div>
+                            <span class="tg-label">Сунна побуждает хорошо относиться к жене</span>
+                        </a>
+
+                        <a href="https://t.me/riyadu_salihin" class="tg-chanel-item" id='yellow'>
+                            <div class="tg-icon-wrapper">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/adabulmufrad.jpg" alt="Logo">
+                            </div>
+                            <span class="tg-label">Книга благонравия</span>
+                        </a>
+
+                        <a href="https://t.me/kniga_o_nikahe" class="tg-chanel-item" id='green'>
+                            <div class="tg-icon-wrapper">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/nikah.jpg" alt="Logo">
+                            </div>
+                            <span class="tg-label">Все о Браке и Разводе</span>
+                        </a>
+
+                        <a href="https://t.me/ochishenie_serdec" class="tg-chanel-item" id='white'>
+                            <div class="tg-icon-wrapper">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/ochishenie.jpg" alt="Logo">
+                            </div>
+                            <span class="tg-label">Очищеие сердец</span>
+                        </a>
+
+
+                        <h3>Сирадж Абу Тальха</h3>
+
+                        <a href="https://t.me/sirajabutalha" class="tg-chanel-item" id='black'>
+                            <div class="tg-icon-wrapper">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/siradj.jpg" alt="Logo">
+                            </div>
+                            <span class="tg-label">Сирадж Абу Тальха</span>
+                        </a>
+
+                        <a href="https://t.me/riyadu_salihin" class="tg-chanel-item" id='black'>
+                            <div class="tg-icon-wrapper">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/sady-pravednyh.jpg" alt="Logo">
+                            </div>
+                            <span class="tg-label">Сады праиведных</span>
+                        </a>
+
+                        <a href="https://t.me/video_siraj" class="tg-chanel-item" id='emerald'>
+                            <div class="tg-icon-wrapper">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/full-siradj.jpg" alt="Logo">
+                            </div>
+                            <span class="tg-label">Полные уроки Сирадж Абу Тальха</span>
+                        </a>
+
+                        <h3>Абу Яхья Крымский</h3>
+
+                        <a href="https://t.me/abuyahya_net" class="tg-chanel-item" id='white'>
+                            <div class="tg-icon-wrapper">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/abu-yahiya.jpg" alt="Logo">
+                            </div>
+                            <span class="tg-label">Абу Яхья Крымский</span>
+                        </a>
+
+                        <a href="https://t.me/abu_yahya_ob_islame" class="tg-chanel-item" id='white'>
+                            <div class="tg-icon-wrapper">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/abu-yahiya-polza.jpg" alt="Logo">
+                            </div>
+                            <span class="tg-label">Пользы из уроков Абу Яхья Крымский</span>
+                        </a>
+
+                        <h3>Telegram канал Свет Сунны🌙✨</h3>
+
+                        <a href="https://t.me/svettsunny" class="tg-chanel-item" id='black'>
+                            <div class="tg-icon-wrapper">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/favicon.jpg" alt="Logo">
+                            </div>
+                            <span class="tg-label">Свет Сунны🌙✨</span>
+                        </a>
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    
+
+    <div class="menu-overlay" id="menu-overlay"></div>
 
     <main class="container">
         <div class="main-layout">
@@ -53,69 +189,70 @@
                         </a>
                     </div>
 
+
                     <div class="tg-chanels">
 
                         <h3>Ринат Абу Мухаммад</h3>
             
                         <a href="https://t.me/toislam" class="tg-chanel-item">
                             <div class="tg-icon-wrapper">
-                                <img src="{% static 'img/to_islam.jpg' %}" alt="Logo">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/to_islam.jpg" alt="Logo">
                             </div>
                             <span class="tg-label">К Исламу</span>
                         </a>
 
                         <a href="https://t.me/tolkovaniya_imen" class="tg-chanel-item">
                             <div class="tg-icon-wrapper">
-                                <img src="{% static 'img/imena-allaha.jpg' %}" alt="Logo">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/imena-allaha.jpg" alt="Logo">
                             </div>
                             <span class="tg-label">Толкование имен Аллаха</span>
                         </a>
 
                         <a href="https://t.me/izuchaem_tauhid" class="tg-chanel-item">
                             <div class="tg-icon-wrapper">
-                                <img src="{% static 'img/tauhid.jpg' %}" alt="Logo">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/tauhid.jpg" alt="Logo">
                             </div>
                             <span class="tg-label">Изучаем Еденбожие / Таухид</span>
                         </a>
 
                         <a href="https://t.me/toislamdata" class="tg-chanel-item" id='red'>
                             <div class="tg-icon-wrapper">
-                                <img src="{% static 'img/video-to-islam.jpg' %}" alt="Logo">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/video-to-islam.jpg" alt="Logo">
                             </div>
                             <span class="tg-label">Видео "К Исламу"</span>
                         </a>
 
                         <a href="https://t.me/izuchaem_sunnu" class="tg-chanel-item" id='violet'>
                             <div class="tg-icon-wrapper">
-                                <img src="{% static 'img/izuchaem-sunnu.jpg' %}" alt="Logo">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/izuchaem-sunnu.jpg" alt="Logo">
                             </div>
                             <span class="tg-label">Изучаем Сунну</span>
                         </a>
 
                         <a href="https://t.me/sunna_pobujdaee" class="tg-chanel-item" id='violet'>
                             <div class="tg-icon-wrapper">
-                                <img src="{% static 'img/sunna-pobuzhdaet.jpg' %}" alt="Logo">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/sunna-pobuzhdaet.jpg" alt="Logo">
                             </div>
                             <span class="tg-label">Сунна побуждает хорошо относиться к жене</span>
                         </a>
 
                         <a href="https://t.me/riyadu_salihin" class="tg-chanel-item" id='yellow'>
                             <div class="tg-icon-wrapper">
-                                <img src="{% static 'img/adabulmufrad.jpg' %}" alt="Logo">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/adabulmufrad.jpg" alt="Logo">
                             </div>
                             <span class="tg-label">Книга благонравия</span>
                         </a>
 
                         <a href="https://t.me/kniga_o_nikahe" class="tg-chanel-item" id='green'>
                             <div class="tg-icon-wrapper">
-                                <img src="{% static 'img/nikah.jpg' %}" alt="Logo">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/nikah.jpg" alt="Logo">
                             </div>
                             <span class="tg-label">Все о Браке и Разводе</span>
                         </a>
 
                         <a href="https://t.me/ochishenie_serdec" class="tg-chanel-item" id='white'>
                             <div class="tg-icon-wrapper">
-                                <img src="{% static 'img/ochishenie.jpg' %}" alt="Logo">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/ochishenie.jpg" alt="Logo">
                             </div>
                             <span class="tg-label">Очищеие сердец</span>
                         </a>
@@ -125,21 +262,21 @@
 
                         <a href="https://t.me/sirajabutalha" class="tg-chanel-item" id='black'>
                             <div class="tg-icon-wrapper">
-                                <img src="{% static 'img/siradj.jpg' %}" alt="Logo">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/siradj.jpg" alt="Logo">
                             </div>
                             <span class="tg-label">Сирадж Абу Тальха</span>
                         </a>
 
                         <a href="https://t.me/riyadu_salihin" class="tg-chanel-item" id='black'>
                             <div class="tg-icon-wrapper">
-                                <img src="{% static 'img/sady-pravednyh.jpg' %}" alt="Logo">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/sady-pravednyh.jpg" alt="Logo">
                             </div>
                             <span class="tg-label">Сады праиведных</span>
                         </a>
 
                         <a href="https://t.me/video_siraj" class="tg-chanel-item" id='emerald'>
                             <div class="tg-icon-wrapper">
-                                <img src="{% static 'img/full-siradj.jpg' %}" alt="Logo">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/full-siradj.jpg" alt="Logo">
                             </div>
                             <span class="tg-label">Полные уроки Сирадж Абу Тальха</span>
                         </a>
@@ -148,14 +285,14 @@
 
                         <a href="https://t.me/abuyahya_net" class="tg-chanel-item" id='white'>
                             <div class="tg-icon-wrapper">
-                                <img src="{% static 'img/abu-yahiya.jpg' %}" alt="Logo">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/abu-yahiya.jpg" alt="Logo">
                             </div>
                             <span class="tg-label">Абу Яхья Крымский</span>
                         </a>
 
                         <a href="https://t.me/abu_yahya_ob_islame" class="tg-chanel-item" id='white'>
                             <div class="tg-icon-wrapper">
-                                <img src="{% static 'img/abu-yahiya-polza.jpg' %}" alt="Logo">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/abu-yahiya-polza.jpg" alt="Logo">
                             </div>
                             <span class="tg-label">Пользы из уроков Абу Яхья Крымский</span>
                         </a>
@@ -164,7 +301,7 @@
 
                         <a href="https://t.me/svettsunny" class="tg-chanel-item" id='black'>
                             <div class="tg-icon-wrapper">
-                                <img src="{% static 'img/favicon.jpg' %}" alt="Logo">
+                                <img src="https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/icon/favicon.jpg" alt="Logo">
                             </div>
                             <span class="tg-label">Свет Сунны🌙✨</span>
                         </a>
@@ -187,6 +324,23 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        const menuBtn = document.getElementById('menu-btn'); // бургер
+        const closeBtn = document.getElementById('close-btn'); // крестик
+        const navMenu = document.getElementById('nav-menu');
+        const overlay = document.getElementById('menu-overlay');
+
+        function toggleMenu() {
+            navMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
+        }
+
+        menuBtn.addEventListener('click', toggleMenu);
+        closeBtn.addEventListener('click', toggleMenu); // Закрытие на крестик
+        overlay.addEventListener('click', toggleMenu); // Закрытие по фону
+    </script>
 
 </body>
 </html>

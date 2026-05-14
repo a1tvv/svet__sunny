@@ -8,7 +8,39 @@
 {% block content %}
 <div class="feed-grid">
 
-    <article class="card" id='page'>
+    <article class="card">
+
+        <div class="card-image">
+            <a href="https://youtube.com/playlist?list=PLRFJeQnBC-ymBP9JvA3dNdX4CDTPeS66t&si=yV45I10C5OC57QYM" target="_blank">
+                <img src="{% static 'img/shahada-1.jpg' %}">
+                </div>
+
+                <div class="card-body">
+                    <span class="card-date"><i class="fa-regular fa-calendar"></i> 13.05.2026</span>
+                    <h2>Свидетельство ЛЯ ИЛЯХА ИЛЛЯ ЛЛАХ</h2>
+                    <p>Плейлист на тему "Свидетельство ЛЯ ИЛЯХА ИЛЛЯ ЛЛАХ"</p>
+                </div>
+            </a>
+
+    </article>
+
+    <article class="card">
+
+        <div class="card-image">
+            <a href="https://youtube.com/playlist?list=PLRFJeQnBC-ykT8cx_n02ELZhLCe-5lMjv&si=RTYC8k9Pe771UG6Z" target="_blank">
+                <img src="{% static 'img/shahada-2.jpg' %}">
+                </div>
+
+                <div class="card-body">
+                    <span class="card-date"><i class="fa-regular fa-calendar"></i> 13.05.2026</span>
+                    <h2>Свидетельство Мухаммад ﷺ расулю-Ллах</h2>
+                    <p>Плейлист на тему "Свидетельство Мухаммад ﷺ расулю-Ллах"</p>
+                </div>
+            </a>
+
+    </article>
+
+    <article class="card" id="yellow">  <!-- убрал id='page', добавил id="yellow" -->
         <div class="card-image">
             <a href="{% url 'sira' %}">
                 <img src="{% static 'img/sira.jpg' %}" alt="Сира">
@@ -84,6 +116,8 @@
             </a>
 
     </article>
+
+
 
 
 

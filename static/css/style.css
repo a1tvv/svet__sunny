@@ -1,4 +1,4 @@
-/* Общие стили */
+/* ========== ДЕСКТОП (БАЗОВЫЕ СТИЛИ) ========== */
 :root {
     --bg-color: #f4f7f6;
     --card-bg: #ffffff;
@@ -14,7 +14,7 @@ body {
     color: var(--text-main);
 }
 
-a{
+a {
     text-decoration: none;
     color: #222;
 }
@@ -25,14 +25,13 @@ a{
     padding: 0 20px;
 }
 
-
-/* Обновленный Header */
+/* Header */
 .header {
     background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px); /* Эффект размытия фона */
+    backdrop-filter: blur(10px);
     padding: 12px 0;
     box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-    position: sticky; /* Шапка липнет к верху */
+    position: sticky;
     top: 0;
     z-index: 1000;
     margin-bottom: 40px;
@@ -42,6 +41,12 @@ a{
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.left-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 .brand {
@@ -57,7 +62,7 @@ a{
     transform: scale(1.02);
 }
 
-/* Навигация */
+/* Навигация десктопная (скрыта на мобилках) */
 .nav {
     display: flex;
     align-items: center;
@@ -74,11 +79,7 @@ a{
 }
 
 .nav-link:hover {
-    background: rgba(0, 162, 236, 0.08); /* Светло-голубой фон при наведении */
-    color: var(--accent-blue);
-}
-
-.nav-link.active {
+    background: rgba(0, 162, 236, 0.08);
     color: var(--accent-blue);
 }
 
@@ -92,41 +93,41 @@ a{
     box-shadow: 0 4px 12px rgba(0, 162, 236, 0.3);
 }
 
-/* Адаптивность для мобилок */
-@media (max-width: 600px) {
-    .header {
-        padding: 10px 0;
-    }
-    
-    .brand {
-        font-size: 1.2rem;
-    }
-
-    .nav-link {
-        padding: 6px 12px;
-        font-size: 0.85rem;
-    }
+/* Кнопка бургера — скрыта на десктопе */
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-main);
 }
 
+/* Мобильное меню (слайдер) — скрыто на десктопе */
+.mobile-nav {
+    display: none;
+}
 
-
+.menu-overlay {
+    display: none;
+}
 
 /* Макет: Лента + Сайдбар */
 .main-layout {
     display: grid;
-    grid-template-columns: 1fr 320px; /* Сайдбар 320px, лента забирает всё остальное */
+    grid-template-columns: 1fr 320px;
     gap: 30px;
     align-items: start;
 }
 
-/* Сетка карточек в ленте (2 в ряд) */
+/* Сетка карточек */
 .feed-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 25px;
 }
 
-/* Стили карточек */
+/* Карточки */
 .card {
     background: var(--card-bg);
     border-radius: 15px;
@@ -167,18 +168,14 @@ a{
     font-size: 0.95rem;
     color: #555;
     line-height: 1.6;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
 }
 
-/* Сайдбар */
+/* Сайдбар (ВИДЕН ВСЕГДА, НЕ СКРЫВАЕМ) */
 .sidebar {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
-
 
 .side-card {
     background: #fff;
@@ -189,17 +186,16 @@ a{
     transition: all 0.3s ease;
 }
 
-.side-card:hover{
+.side-card:hover {
     background-color: #dfdfdf;
 }
 
-.fa-kaaba{
+.fa-kaaba {
     color: var(--accent-blue);
 }
 
 .profile-logo {
     font-size: 50px;
-    color: var(--accent);
     margin-bottom: 15px;
 }
 
@@ -211,15 +207,18 @@ a{
 .banner-ad img {
     width: 100%;
     display: block;
-    transition: opacity 0.3s;
 }
 
-.profile-card h3, p{
+.profile-card h3, .profile-card p {
     color: #555;
-    text-decoration: none;
 }
 
-/* Контейнер-ссылка (эффект кнопки-плеера) */
+/* Telegram ссылки в сайдбаре */
+.tg-chanels h3 {
+    margin: 15px 0 5px 0;
+    font-size: 1rem;
+}
+
 .tg-chanel-item {
     display: flex;
     align-items: center;
@@ -237,66 +236,36 @@ a{
     transform: scale(0.98);
 }
 
-/* Обертка для картинки (иконка слева) */
 .tg-icon-wrapper {
-    width: 45px;  /* Размер как у иконки паузы на скрине */
+    width: 45px;
     height: 45px;
-    border-radius: 8px; /* Скругление как у аватарок в ТГ */
+    border-radius: 8px;
     overflow: hidden;
-    flex-shrink: 0; /* Чтобы картинка не сжималась */
+    flex-shrink: 0;
     margin-right: 15px;
 }
 
 .tg-icon-wrapper img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Чтобы фото не искажалось */
+    object-fit: cover;
 }
 
-/* Текст (название канала) */
 .tg-label {
-    color: #ffffff !important; /* Белый текст на синем фоне */
-    font-size: 1.1rem;
+    color: #ffffff !important;
+    font-size: 1rem;
     font-weight: 500;
-    font-family: inherit;
 }
 
-/* Убираем твои старые стили, которые могли мешать */
-.tg-img {
-    display: none; /* Это больше не нужно, мы используем .tg-label */
-}
-
-#red{
-    background-color:#e1306c;
-}
-
-#violet{
-    background-color: #6b3082;
-}
-
-#green{
-    background-color: #92d3d7;
-}
-
-#black{
-    background-color: #222;
-}
-
-#emerald{
-    background-color: #00685b;
-}
-
-#white{
-    background-color: #d4d4d4;
-}
-
-#yellow{
-    background-color: #f8c512;
-}
-
-#page{
-    background-color: #e3e3e3;
-}
+/* Цвета для каналов */
+#red { background-color: #e1306c; }
+#violet { background-color: #6b3082; }
+#green { background-color: #92d3d7; }
+#black { background-color: #222; }
+#emerald { background-color: #00685b; }
+#white { background-color: #d4d4d4; }
+#yellow { background-color: #f8c512; }
+#sira-yellow{ background-color: #ffd339;}
 
 /* Footer */
 .footer {
@@ -306,120 +275,108 @@ a{
     border-top: 1px solid #eee;
 }
 
-.footer-sections {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 40px;
-    margin-bottom: 40px;
-}
-
-.footer-sections h4 {
-    margin-bottom: 20px;
-    color: var(--accent);
-}
-
-.footer-sections ul {
-    list-style: none;
-    padding: 0;
-}
-
-.footer-sections li {
-    margin-bottom: 10px;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-}
-
 .footer-bottom {
     text-align: center;
     padding-top: 20px;
     border-top: 1px solid #f0f0f0;
 }
 
-.footer-bottom a{
+.footer-bottom a {
     color: var(--accent-blue);
 }
 
-.footer-socials i {
-    font-size: 1.2rem;
-    margin: 0 10px;
-    cursor: pointer;
-}
+/* ========== АДАПТИВ (max 600px) ========== */
+@media (max-width: 600px) {
+    /* Скрываем десктопную навигацию */
+    .header .nav {
+        display: none;
+    }
 
-/* Адаптивность */
-@media (max-width: 992px) {
+    /* Показываем бургер */
+    .menu-toggle {
+        display: block;
+    }
+
+    /* Сетка карточек в 1 колонку */
+    .feed-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Макет в колонку */
     .main-layout {
         grid-template-columns: 1fr;
+        gap: 20px;
     }
+
+    /* Сайдбар НЕ скрываем — он виден */
     .sidebar {
-        order: -1; /* Сайдбар сверху на мобилках */
-    }
-}
-
-@media (max-width: 600px) {
-    .feed-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .header {
-        padding: 20px 0;
-    }
-    
-    .brand {
-        margin-bottom: 25px;
-        display: block;
-    }
-
-    .header-content {
-        flex-direction: column;
-        align-items: stretch; /* Растягиваем содержимое на всю ширину */
-        text-align: center;
-    }
-
-    .nav {
         display: flex;
-        flex-direction: column; /* Складываем лекторов в столбик */
-        gap: 10px;
+    }
+
+    /* Мобильное меню (слайдер) */
+    .mobile-nav {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 85%;
+        max-width: 300px;
+        height: 100vh;
+        background: white;
+        transition: left 0.3s ease;
+        z-index: 9999;
+        flex-direction: column;
+        padding: 60px 0 20px 0;
+        box-shadow: 10px 0 20px rgba(0,0,0,0.2);
+        overflow-y: auto;
+    }
+
+    .mobile-nav.active {
+        left: 0;
+    }
+
+    .mobile-nav .nav-scroll-content {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        padding: 0 20px;
+    }
+
+    .close-menu {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 28px;
+        cursor: pointer;
+        width: 40px;
+        height: 40px;
+    }
+
+    .menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
         width: 100%;
-        margin-left: 0;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9000;
     }
 
-    .nav a {
-        margin: 0;
-        font-size: 1rem;
-        padding: 10px;
-        background: #f9f9f9; /* Легкая подложка для кликабельности */
-        border-radius: 8px;
-    }
-
-    /* Стили для выпадающего меню в мобилке */
-    .dropdown-content {
-        position: static; /* Меню просто раздвигает контент вниз */
-        display: none;    /* Скрыто по умолчанию */
-        transform: none;
-        box-shadow: none;
-        width: 100%;
-        background: #ffffff;
-        border: 1px solid #eee;
-        margin-top: 5px;
-    }
-
-    /* Показываем при нажатии (на мобилках hover работает как клик) */
-    .dropdown:hover .dropdown-content {
+    .menu-overlay.active {
         display: block;
     }
 
-    .dropdown-content a {
-        background: transparent;
-        border-bottom: 1px solid #f0f0f0;
-        text-align: center;
+    body.menu-open {
+        overflow: hidden;
     }
 
-    .dropdown-content a:last-child {
-        border-bottom: none;
+    .tg-chanels{
+        display: none;
     }
-    
-    .feed-grid {
-        grid-template-columns: 1fr;
+
+    .tg-chanel-item:last-of-type{
+        margin-bottom: 80px;
     }
 }
-

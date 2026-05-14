@@ -55,24 +55,6 @@ body {
 }
 
 .audio-item {
-    margin-bottom: 15px;
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-    border: 1px solid var(--accent-blue);
-    box-shadow: 0 2px 5px rgba(0, 102, 153, 0.1);
-}
-
-.audio-item p {
-    margin: 0 0 8px 0;
-    font-weight: 500;
-}
-
-audio {
-    width: 100%;
-    height: 35px;
-}
-
-.audio-item {
     background: #ffffff;
     border: 1px solid #eef2f5;
     border-radius: 12px;
@@ -80,7 +62,6 @@ audio {
     margin-bottom: 15px;
     transition: all 0.3s ease;
 }
-
 
 .audio-info {
     display: flex;
@@ -106,10 +87,8 @@ audio {
     height: 35px;
     background-color: #f1f3f4;
     border-radius: 8px;
-    filter: sepia(100%) saturate(300%) hue-rotate(190deg) brightness(90%);
 }
 
-/* Дополнительно для Chrome/Safari, чтобы контролы были четче */
 .sira-audio::-webkit-media-controls-panel {
     background-color: #f1f3f4;
 }
@@ -155,6 +134,7 @@ audio {
     padding-left: 5px;
 }
 
+/* Контрольные вопросы */
 .control-questions-card {
     background: #ffffff;
     border-radius: 12px;
@@ -162,7 +142,6 @@ audio {
     margin: 20px 0;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     border-left: 5px solid var(--accent-blue);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .card-header {
@@ -198,35 +177,53 @@ audio {
 }
 
 .questions-list li::marker {
-    color: var(--accent-blue); /* Цвет номеров */
+    color: var(--accent-blue);
     font-weight: bold;
 }
 
-/* Эффект при наведении на вопрос */
 .questions-list li:hover {
     color: #000;
     transition: 0.2s;
 }
 
-.pagination {
+/* Пагинация */
+.pagination-container {
     display: flex;
-    justify-content: center;
-    margin: 30px 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 40px 0;
+}
+
+.page-status {
+    font-size: 0.85rem;
+    color: #888;
 }
 
 .step-links {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     background: #fff;
     padding: 8px 15px;
-    border-radius: 50px;
+    border-radius: 25px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    flex-wrap: wrap;
+    max-width: 100%;
 }
 
 .page-numbers {
     display: flex;
+    align-items: center;
     gap: 5px;
+}
+
+.page-btn.ellipsis {
+    background: none; /* Убираем фон у троеточия */
+    cursor: default;
+    color: #888;
+    min-width: 20px;
 }
 
 .page-btn {
@@ -247,7 +244,6 @@ audio {
     background: #f0f0f0;
 }
 
-/* СТИЛЬ ДЛЯ ТЕКУЩЕЙ СТРАНИЦЫ */
 .page-btn.active {
     background: var(--accent-blue);
     color: #fff;
@@ -259,9 +255,34 @@ audio {
     color: var(--accent-blue);
 }
 
+.last-btn {
+    padding: 5px 15px;
+    font-weight: bold;
+}
+
 /* Адаптивность */
 @media (max-width: 850px) {
     .container {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-numbers {
+        gap: 3px;
+    }
+    .page-btn {
+        min-width: 30px;
+        height: 30px;
+        padding: 5px 8px;
+    }
+}
+
+@media (max-width: 430px) {
+    .page-btn {
+        min-width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+        padding: 0;
     }
 }

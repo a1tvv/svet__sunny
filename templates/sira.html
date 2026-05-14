@@ -19,6 +19,7 @@
     </div>
 
     <div class="audio-section">
+
         <a href="https://t.me/istoriya_proroka" class="btn-download" target='blank'>
             <i class="fa-brands fa-telegram"> </i> Telegram
         </a>
@@ -34,15 +35,21 @@
             </div>
         {% endfor %}
 
-        <div class="pagination">
+        <div class="pagination-container">
+            <div class="page-status">
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+            </div>
+            
             <div class="step-links">
-                {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}" class="page-btn nav-btn">‹</a>
-                {% endif %}
-
                 <div class="page-numbers">
-                    {% for num in page_obj.paginator.page_range %}
-                        <a href="?page={{ num }}" class="page-btn {% if page_obj.number == num %}active{% endif %}">{{ num }}</a>
+                    {% for num in elided_pages %}
+                        {% if num == page_obj.paginator.ELLIPSIS %}
+                            <span class="page-btn ellipsis">...</span>
+                        {% elif num == page_obj.number %}
+                            <span class="page-btn active">{{ num }}</span>
+                        {% else %}
+                            <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+                        {% endif %}
                     {% endfor %}
                 </div>
 
@@ -51,6 +58,7 @@
                 {% endif %}
             </div>
         </div>
+        
     </div>
 
     <div class="control-questions-card">

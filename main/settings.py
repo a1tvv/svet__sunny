@@ -8,12 +8,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-default-key')
 
-# На Vercel DEBUG будет выключен автоматически
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
-if 'VERCEL' in os.environ:
-    DEBUG = True
+# На Vercel DEBUG будет выключен
+DEBUG = False
 
-ALLOWED_HOSTS = ['nurassunnah.vercel.app', '.vercel.app', '127.0.0.1', 'localhost']
+if 'VERCEL' in os.environ:
+    ALLOWED_HOSTS = [
+        'nur-as-sunnah.com',
+        'www.nur-as-sunnah.com',
+        'nurassunnah.vercel.app',
+        '.vercel.app'
+    ]
+else:
+    ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',

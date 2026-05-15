@@ -11,6 +11,16 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-default-key')
 # На Vercel DEBUG будет выключен
 DEBUG = False
 
+if 'VERCEL' in os.environ:
+    ALLOWED_HOSTS = [
+        'nur-as-sunnah.com',
+        'www.nur-as-sunnah.com',
+        '.nur-as-sunnah.com',  # Точка в начале разрешает все поддомены
+        'nurassunnah.vercel.app',
+        '.vercel.app'
+    ]
+else:
+    ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 INSTALLED_APPS = [

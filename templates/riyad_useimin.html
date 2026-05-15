@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/riyad_useimin.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<h3>Страница в процессе разработки.</h3>
+{% comment %} 
+<div class="lesson-item">
+    <h3>{{ lesson.title }}</h3>
+    
+    <audio controls>
+        <source src="{{ lesson.audio_url }}" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио.
+    </audio>
+
+    {% if lesson.matn_pdf %}
+        <a href="{{ lesson.matn_pdf.url }}" target="_blank">Читать матн (PDF)</a>
+    {% endif %}
+    
+    <div class="description">
+        {{ lesson.description|linebreaks }}
+    </div>
+</div> {% endcomment %}
+
+{% endblock %}

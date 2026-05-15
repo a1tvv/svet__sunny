@@ -1,5 +1,6 @@
 from django.core.paginator import Paginator
 from django.shortcuts import render
+from .models import RiyadhAsSalihin
 
 def index(request):
     sheikh = {
@@ -13,6 +14,21 @@ def index(request):
 
 def tafsir(request):
     return render(request,  'tafsir.html')
+
+
+def riyad_useimin(request):
+    lessons_list = RiyadhAsSalihin.objects.all()
+    paginator = Paginator(lessons_list, 10) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    elided_pages = paginator.get_elided_page_range(page_obj.number, on_each_side=1, on_ends=2)
+
+    return render(request, 'riyad_useimin.html', {
+        'page_obj': page_obj,
+        'lessons': page_obj.object_list, # Теперь в цикле можно писать {% for lesson in lessons %}
+        'elided_pages': elided_pages
+    })
 
 from django.core.paginator import Paginator
 from django.shortcuts import render

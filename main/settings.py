@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-default-key')
 
 # На Vercel DEBUG будет выключен
-DEBUG = False
+DEBUG = True
 
 if 'VERCEL' in os.environ:
     ALLOWED_HOSTS = [

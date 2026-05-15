@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-default-key')
 
 # На Vercel DEBUG будет выключен
-DEBUG = True
+DEBUG = False
 
 if 'VERCEL' in os.environ:
     ALLOWED_HOSTS = [
@@ -21,6 +21,12 @@ if 'VERCEL' in os.environ:
     ]
 else:
     ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+    
+CSRF_TRUSTED_ORIGINS = [
+    'https://nur-as-sunnah.com',
+    'https://www.nur-as-sunnah.com',
+    'https://nurassunnah.vercel.app'
+]
 
 
 INSTALLED_APPS = [
@@ -111,6 +117,9 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+# Это позволит сайту работать, даже если какой-то файл статики потерялся
+WHITENOISE_MANIFEST_STRICT = False
 
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

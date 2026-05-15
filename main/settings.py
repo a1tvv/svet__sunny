@@ -109,17 +109,27 @@ AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 AWS_DEFAULT_ACL = 'public-read'
 AWS_QUERYSTRING_AUTH = False
 
+# 1. Изменяем хранилище статики как в RentUi
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.StaticFilesStorage", # Убрали CompressedManifest
     },
 }
 
-# Это позволит сайту работать, даже если какой-то файл статики потерялся
+# 2. Добавляем параметры WhiteNoise из твоего примера
+WHITENOISE_USE_FINDERS = True
 WHITENOISE_MANIFEST_STRICT = False
 
-MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# 3. База данных (ВНИМАНИЕ)
+# В RentUi ты используешь dj_database_url и Neon. 
+# Если хочешь оставить SQLite, оставь как есть, но для реального проекта 
+# лучше создай базу на Neon и вставь её URL сюда, как ты сделал в RentUi.
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}

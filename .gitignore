@@ -1,0 +1,4 @@
+static/audio/
+*.mp3
+*.pyc
+__pycache__/

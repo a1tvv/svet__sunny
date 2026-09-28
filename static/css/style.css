@@ -210,7 +210,7 @@ img { max-width: 100%; display: block; }
 .channel-banner {
     position: relative;
     width: 100%;
-    height: 240px;
+    height: 600px;
     border-radius: 16px;
     overflow: hidden;
     margin-bottom: 20px;
@@ -592,7 +592,7 @@ img { max-width: 100%; display: block; }
     .right-group .tg-link { display: none; }
 
     .channel-banner {
-        height: 160px;
+        height: 320px;
         border-radius: 12px;
         margin-bottom: 16px;
     }

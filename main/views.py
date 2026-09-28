@@ -2,14 +2,94 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.conf import settings
 from django.core.management import call_command
+from django.core.paginator import Paginator
+from django.db.models import Q, Count
+from django.db import DatabaseError
+from main.models import Card
+from main.search import smart_search
 
-from .models import Card
+
+def _clean_param(value, max_len=200):
+    """Безопасно приводит GET-параметр к строке."""
+    if not value:
+        return ''
+    try:
+        return str(value).strip()[:max_len]
+    except Exception:
+        return ''
+
+
+def _basic_filter(cards, q):
+    """Запасной простой поиск — только если умный поиск упадёт с ошибкой."""
+    words = [w for w in q.split() if len(w) >= 2] or [q]
+    for word in words:
+        cards = cards.filter(Q(title__icontains=word) | Q(description__icontains=word))
+    return cards
 
 
 def index(request):
-    cards = Card.objects.filter(is_active=True)
-    return render(request, 'index.html', {'cards': cards})
+    q = _clean_param(request.GET.get('q', ''))
+    channel = _clean_param(request.GET.get('channel', ''))
+    page_number = request.GET.get('page', 1)
 
+    q_used = q  # что реально искали (если раскладка/транслит были исправлены)
+
+    try:
+        base = Card.objects.filter(card_type='youtube', is_active=True)
+
+        if q:
+            try:
+                ids, q_used = smart_search(q, channel)
+                paginator = Paginator(ids, 50)
+                page_obj = paginator.get_page(page_number)
+                by_id = Card.objects.in_bulk(page_obj.object_list)
+                page_obj.object_list = [by_id[i] for i in page_obj.object_list if i in by_id]
+            except DatabaseError:
+                raise
+            except Exception:
+                cards = _basic_filter(base, q)
+                if channel:
+                    cards = cards.filter(channel_id=channel)
+                paginator = Paginator(cards.order_by('-published', '-id'), 50)
+                page_obj = paginator.get_page(page_number)
+        else:
+            cards = base.filter(channel_id=channel) if channel else base
+            paginator = Paginator(cards.order_by('-published', '-id'), 50)
+            page_obj = paginator.get_page(page_number)
+
+        channels = (
+            base.exclude(channel_name__isnull=True)
+            .exclude(channel_name='')
+            .values('channel_id', 'channel_name')
+            .annotate(n=Count('id'))
+            .order_by('-n')
+        )
+        total_count = base.count()
+
+    except Exception:
+        paginator = Paginator(Card.objects.none(), 50)
+        page_obj = paginator.get_page(1)
+        channels = []
+        total_count = 0
+
+    return render(request, 'index.html', {
+        'page_obj': page_obj,
+        'q': q,
+        'q_used': q_used,
+        'selected_channel': channel,
+        'channels': channels,
+        'total_count': total_count,
+    })
+
+
+def _clean_param(value, max_len=200):
+    """Безопасно приводит GET-параметр к строке."""
+    if not value:
+        return ''
+    try:
+        return str(value).strip()[:max_len]
+    except Exception:
+        return ''
 
 def admin_info(request):
     admin_data = {
@@ -20,44 +100,502 @@ def admin_info(request):
         'about': 'По всем вопросам пишите в Telegram. '
                  'Проект не нуждается в финансировании, достаточно просто поделиться ссылкой с близкими.',
     }
-    return render(request, 'admin_info.html', {'admin': admin_data})
+    try:
+        return render(request, 'admin_info.html', {'admin': admin_data})
+    except Exception:
+        return JsonResponse({'error': 'admin page unavailable'}, status=500)
 
 
 def latest_video(request):
-    """Возвращает ID последнего YouTube-видео (для уведомлений)."""
-    card = Card.objects.filter(card_type='youtube').order_by('-id').first()
-    if card:
-        return JsonResponse({
-            'id': card.url,
-            'title': card.title,
-            'url': card.url,
-            'image': card.get_image(),
-        })
-    return JsonResponse({'id': None})
-
-
-def sira(request):
-    return render(request, 'sira.html')
-
+    try:
+        card = Card.objects.filter(card_type='youtube').order_by('-id').first()
+        if card:
+            return JsonResponse({
+                'id': card.url,
+                'title': card.title,
+                'url': card.url,
+                'image': card.image_url,
+            })
+        return JsonResponse({'id': None})
+    except Exception:
+        return JsonResponse({'id': None}, status=200)
 
 def riyad_useimin(request):
-    return render(request, 'riyad_useimin.html')
+    try:
+        return render(request, 'riyad_useimin.html')
+    except Exception:
+        return JsonResponse({'error': 'page unavailable'}, status=500)
 
 
 def tafsir(request):
-    return render(request, 'tafsir.html')
+    try:
+        return render(request, 'tafsir.html')
+    except Exception:
+        return JsonResponse({'error': 'tafsir page unavailable'}, status=500)
 
 
 def cron_parse_youtube(request):
-    """Endpoint для Vercel Cron: запускает парсер YouTube."""
-    auth = request.headers.get('Authorization', '')
-    expected = f'Bearer {settings.CRON_SECRET}'
-
-    if not settings.CRON_SECRET or auth != expected:
-        return JsonResponse({'error': 'forbidden'}, status=403)
-
     try:
+        auth = request.headers.get('Authorization', '')
+        expected = f'Bearer {settings.CRON_SECRET}'
+
+        if not settings.CRON_SECRET or auth != expected:
+            return JsonResponse({'error': 'forbidden'}, status=403)
+
         call_command('parse_youtube')
         return JsonResponse({'status': 'ok'})
+
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+        return JsonResponse({'status': 'error', 'message': str(e)[:300]}, status=500)
+
+
+def sira(request):
+    pages_data = [
+        {
+            "id": 1,
+            "tracks": [
+                {"title": "1. Вступление. Положение арабов до Ислама.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_001.mp3"},
+                {"title": "2. История Ибрахима, мир ему и Хаджар.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_002.mp3"},
+                {"title": "3. История Хаджар и источника воды Зам-зам.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_003.mp3"},
+                {"title": "4. История прибытия племени Джурхум в Мекку", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_004.mp3"},
+                {"title": "5. История Ибрахима и жен Исма’иля.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_005.mp3"},
+                {"title": "6. Строительство Каабы Ибрахимом и Исма’илем", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_006.mp3"},
+                {"title": "7. Начало распространения многобожия среди арабов.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_007.mp3"},
+                {"title": "8. История того, как распространился иудаизм на Аравийском полуострове.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_008.mp3"},
+                {"title": "9. История того, как распространилось христианство на Аравийском полуострове.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_009.mp3"},
+                {"title": "10. История Абрахи и Слона.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_010.mp3"},
+            ],
+            "questions": [
+                "Каковы цели изучения жизнеописания (сиры) Пророка, да благословит его Аллах и приветствует?",
+                "Как звали мать Исма’иля?",
+                "Какой урок мы извлекаем из истории Ибрахима и Хаджар в Мекке?",
+                "Как называлось племя, пришедшее в Мекку?",
+                "Какую пользу мы берем из диалога Ибрахима с женой Исма’иля?",
+                "Что такое «Макаму Ибрахим»?",
+                "Какое племя напало на племя Джурхум?",
+                "Кто первым принес ширк на землю арабов?",
+                "Имя первого идола, который появился в Мекке?",
+                "Какой скверный обычай ввел ’Амр ибн Люхайй помимо тальбиййи?",
+                "Какие самые странные божества были в Мекке и какова их история?",
+                "Что такое «Ясриб»?",
+                "Кто принял Ислам первым не из числа мекканцев?",
+                "Откуда пришли евреи в Мекку?",
+                "Кто первым покрыл материалом Каабу и кем он был?",
+                "Чему поклонялись «наджрань» до прихода христианства?",
+                "Как звали царя, который называл себя богом, и каким государством он правил?",
+                "Каким образом мальчик, ходивший к монаху и колдуну, узнал истину?",
+                "Какими караматами (чудесами) обладал этот мальчик?",
+                "Какое ду’а (мольбу) надо говорить тому, кто хочет спастись от зла людей?",
+                "Сколько людей приняло христианство после казни мальчика?",
+                "Какое чудо произошло во время казни принявших христианство?",
+                "Перечисли запретные месяцы.",
+                "Кто такие «ахлю-ан-наси»?",
+                "Как звали царя, который хотел разрушить Каабу и каким государством он правил?",
+                "Как звали слона, на котором сидел верхом царь?"
+            ]
+        },
+        {
+            "id": 2,
+            "tracks": [
+                {"title": "11. История того, как персы попали в Йемен.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_011.mp3"},
+                {"title": "12. История Курайшитов.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_012.mp3"},
+                {"title": "13. История ’Абдуль-мутталиба и Зам-зама.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_013.mp3"},
+                {"title": "14. История рождения отца Пророка ﷺ, ’Абдуллаха.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_014.mp3"},
+                {"title": "15. Рождение Пророка Мухаммада ﷺ.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_015.mp3"},
+                {"title": "16. Раннее детство Пророка ﷺ.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_016.mp3"},
+                {"title": "17. Пророк ﷺ на воспитании у ’Абдуль-мутталиба.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_017.mp3"},
+                {"title": "18. Пророк ﷺ на воспитании у своего дяди Абу Талиба.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_018.mp3"},
+            ],
+            "questions": [
+                "Как звали царя Персии, который разорвал письмо Пророка ﷺ?",
+                "Кто построил «дар ан-надва»?",
+                "Кому он завещал всё своё имущество и почему?",
+                "Кто и как купил «дар ан-надва» у потомков ’Абду ад-Дар. И как он потом продал его?",
+                "Какое настоящее имя деда Пророка ﷺ ’Абдуль-мутталиба?",
+                "Когда родился Пророк ﷺ?",
+                "В чём величие Пророка ﷺ?",
+                "Откуда колдуны узнают о сокровенном?",
+                "Каково положение того человека, который идёт к колдуну?",
+                "Что должно стоять на первом месте: разум (’акль) или Коран и Сунна (накль)?",
+                "Почему курайшиты отдавали своих детей в разные племена?",
+                "Как звали молочную мать Пророка ﷺ?",
+                "Сколько лет было Пророку ﷺ когда умерла его мать?",
+                "В чём мудрость того, что Всевышний Аллах предопределил, чтобы Пророк ﷺ находился со своим дедом на разных переговорах?",
+                "В чём был секрет бедности деда Пророка ﷺ?",
+                "Кто после смерти деда Пророка ﷺ взял Пророка ﷺ на воспитание?",
+                "В чём мудрость того, что Аллах предопределил пророкам быть пастухами?",
+                "Кто такие физиогномики («ахль аль-фараса»)?",
+            ]
+        },
+         {
+            "id": 3,
+            "tracks": [
+                {"title": "19. О нравах Пророка ﷺ  до пророчества.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_019.mp3"},
+                {"title": "20. Женитьба на Хадидже и о детях Пророка ﷺ.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_020.mp3"},
+                {"title": "21. Строительство Каабы курайшитами.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_021.mp3"},
+                {"title": "22. Начало пророчества.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_022.mp3"},
+                {"title": "23. О единобожниках в Мекке до пророчества Мухаммада ﷺ.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_023.mp3"},
+                {"title": "24. О начале призыва и о тех, кто первыми приняли Ислам.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_024.mp3"},
+                {"title": "25. О призыве курайшитов и родственников Пророка ﷺ.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_025.mp3"},
+                {"title": "26. О тех, кто принял Ислам из бедных жителей Мекки и о призыве Абу Бакра, да будет доволен им Аллах.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_026.mp3"},
+                {"title": "27. Защита Абу Талибом, Пророка ﷺ.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_027.mp3"},
+                {"title": "28. О диалоге Пророка ﷺ с Уалид ибн Мугъирой и чуде Корана.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_028.mp3"},
+                {"title": "29. Избиение курайшитами Пророка ﷺ и ислам дяди Пророка ﷺ Хамзы, да будет доволен им Аллах.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_029.mp3"},
+                {"title": "30. Принятие Ислама Абу Зарром, да будет доволен им Аллах.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_030.mp3"},
+                {"title": "31. О том, как курайшиты требовали от Пророка ﷺ разные чудеса.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_031.mp3"},
+                {"title": "32. О попытке Абу Джахля убить Пророка ﷺ и мучении рабов принявших Ислам.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_032.mp3"},
+                {"title": "33. Начало хиджры в Эфиопию. История Абу Бакра с Абу Дуганой.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_033.mp3"},
+                {"title": "34. История Ислама Умара ибн аль-Хаттаба, да будет доволен им Аллах.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_034.mp3"},
+            ],
+            "questions": [
+                "Как звали первую жену Пророка ﷺ?",
+                "Сколько лет было Пророку ﷺ и его жене когда они поженились? Какой был махрам (калым)?",
+                "Имеет ли право простой мусульманин иметь столько же жён, сколько имел Пророк ﷺ?",
+                "Перечисли имена детей Пророка ﷺ.",
+                "С каким договором курайшиты перестроили Каабу?",
+                "Кто из курайшитов начал ломать Каабу?",
+                "Можно ли запрещать порицаемое, если в этом или после этого следует такое же порицаемое или больше? Приведите доказательство.",
+                "Какими были первые аяты, ниспосланные Пророку ﷺ?",
+                "Сколько раз Пророк ﷺ видел Джибриля, мир ему, в его настоящем виде?",
+                "Как звали сына дяди Хадиджи и кем он был?",
+                "Что сказал сын дяди Хадиджи Пророку ﷺ когда он рассказал ему о том, что с ним случилось?",
+                "Почему иудеи под гневом Всевышнего Аллаха?",
+                "Можно ли брать в довод большинство и почему?",
+                "Перечисли первых людей, принявших Ислам?",
+                "Можно ли менять отчество и фамилию сироты, взятого на воспитание?",
+                "Перечисли самых лучших людей в нашей общине после Пророка ﷺ.",
+                "Про кого была ниспослана сура «аль-Масад»?",
+                "Какую пользу мы берём из обращения Пророка ﷺ к Фатиме: «Совершай дела, я ничем не могу помочь тебе в Судный день»?",
+                "Когда начинается Судный день для каждого человека?",
+                "Какая из причин того, что бедные люди быстрее отвечают на призыв чем богатые?",
+                "Даёт ли Аллах победу Исламу через неверующих и нечестивцев?",
+                "Допускается ли национализм в Исламе?",
+                "Что сказал Уалид ибну Мугъира курайшитам о Коране после его диалога с Пророком ﷺ?",
+                "Как звали Абу Джахля?",
+                "Почему Пророк ﷺ отказал просьбам курайшитов о каком-нибудь чуде?",
+                "Кто был одним из тех, кого сильно мучили и каким образом его мучили?",
+                "Кто был первым шахидом в Исламе?",
+                "Берёт ли человек грех за то дело, к совершению которого был принуждён?",
+                "Куда была сделана первая хиджра?",
+                "Кто первым сделал хиджру?",
+                "Как ’Умар, да будет доволен им Аллах, принял Ислам?"
+                
+            ]
+        },
+            {
+            "id": 4,
+            "tracks": [
+                {"title": "35. История ’Укбы ибн Аби Муайита с Пророком ﷺ. О влиянии плохих друзей.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_035.mp3"},
+                {"title": "36. Очередные попытки курайшитов договориться с Пророком ﷺ остановить призыв.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_036.mp3"},
+                {"title": "37. Издевательство курайшитов над Пророком ﷺ в Мекке.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_037.mp3"},
+                {"title": "38. Бойкотирование и экономическая блокада Пророка ﷺ и его рода.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_038.mp3"},
+                {"title": "39. Год печали. Смерть дяди Пророка ﷺ Абу Талиба и Хадиджы, да будет доволен ею Аллах.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_039.mp3"},
+                {"title": "40. Выход Пророка ﷺ из Мекки в Таиф.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_040.mp3"},
+                
+                {"title": "41. Возвращение из Таифа в Мекку. Защита Пророка ﷺ Мут’имом ибн ‘Ади.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_041.mp3"},
+                {"title": "42. Истрия принятия Ислама джиннами.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_042.mp3"},
+                {"title": "43. История сподвижников в Эфиопии с эфиопским царем.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_043.mp3"},
+                {"title": "44. «аль-Исра» — перенесение Пророка ﷺ из Мекки в мечеть аль-Акса в Иерусалиме.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_044.mp3"},
+                {"title": "45. «аль-Ми’радж» — вознесение Пророка ﷺ на небеса.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_045.mp3"},
+                {"title": "46. Раскол Луны.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_046.mp3"},
+                
+                {"title": "47. Призыв арабов, посещающих Мекку и деятельность Абу Ляхаба.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_047.mp3"},
+                {"title": "48. Начало принятие Ислама жителями Медины и первая присяга «’Акабат аль-уля».", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_048.mp3"},
+                {"title": "49. Об Исламе Туфайля ибн ‘Амра и о смысле свидетельства «Мухаммад расулю-Ллах».", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_049.mp3"},
+                {"title": "50. Делегация жителей Медины и вторая присяга.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_050.mp3"},
+                
+                {"title": "51. Начало переселения сподвижников в Медину.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_051.mp3"},
+                {"title": "52. Решение курайшитов убить Пророка ﷺ.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_052.mp3"},
+                {"title": "53. Переселение Пророка ﷺ и Абу Бакара, да будет доволен им Аллах.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_053.mp3"},
+            ],
+               "questions": [
+                    "На какой религии рождается человек?",
+                    "Можно ли уподобляться неверующим с целью призыва их к Исламу?",
+                    "Можно ли торопиться с ответом на ду’а?",
+                    "Верили ли курайшиты в существование Всевышнего Аллаха?",
+                    "Сколько лет продолжался бойкот мусульманам?",
+                    "Кто первым начал бороться против бойкота?",
+                    "Какую пользу берём из того, что Пророк ﷺ и его сподвижники были подвергнуты испытаниям и трудностям на пути распространения истины?",
+                    "Является ли мусульманином тот человек, который убеждён в истинности Ислама, однако не произносит шахаду вслух?",
+                    "Почему один из годов в жизни Пророка ﷺ был назван «годом печали»?",
+                    "Что Пророк ﷺ ответил ангелам, которые пришли уничтожить многобожников?",
+                    "Как называлось племя джиннов, которые слушали Пророка ﷺ?",
+                    "Какими из хороших нравов обладал Наджаши и какой урок нам в этом?",
+                    "Какую суру Джа’фар читал для Наджаши?",
+                    "В чём величие мечети аль-Акса?",
+                    "Можно ли справлять ночь «Исра и Ми’радж» или день рождения Пророка ﷺ и почему?",
+                    "Сколько у мусульман праздников?",
+                    "Откуда была Исра, т.е. где был Пророк ﷺ?",
+                    "На чём перенёсся Пророк ﷺ в мечеть «аль-Акса»?",
+                    "Кого пророк ﷺ видел на первом небе?",
+                    "Как называется загробная жизнь?",
+                    "Кого Пророк ﷺ видел на седьмом небе?",
+                    "В чём величие молитвы?",
+                    "Сколько молитв было вменено Аллахом в обязанность в первый раз?",
+                    "За какое время произошло Исра и Ми’радж?",
+                    "Какое чудо Пророк ﷺ показал курайшитам в Мекке?",
+                    "На сколько групп делилось население Медины?",
+                    "Почему первая присяга называлась «присягой женщин»?",
+                    "Кто был первым послом в Исламе?",
+                    "Кто предложил убить Пророка ﷺ и в чём заключалось это предложение?",
+                    "С кем Пророк ﷺ сделал хиджру?",
+                    "Какую пользу мы берём из хиджры Пророка ﷺ?",
+                    "Кто описал внешность Пророка ﷺ лучше всех?",
+                    "Когда Пророк ﷺ сделал хиджру?"
+                ]
+            },
+            
+            {
+            "id": 5,
+            "tracks": [
+                {"title": "54. Прибытие Пророка ﷺ в Медину, его встреча и первые его приказы. Приказ строить мечеть. Первая пятничная молитва.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_054.mp3"},
+                {"title": "55. Строительство мечети. Остановка Пророка ﷺ у Абу Айюба. Встреча Пророка ﷺ с иудейским ученым ’Абдуллах ибн Салямом.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_55.mp3"},
+                {"title": "56. Братование между ансарами и мухаджирами. Новые порядки и указы Пророка ﷺ в Медине.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_056.mp3"},
+                {"title": "57. Первый новорожденный в Медине. Женитьба Пророка ﷺ на ’Аише, да будет доволен ею Аллах. Добавка двух рака’атов к молитве. Азан. Первые военные отряды (сарийя).", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_057.mp3"},
+                {"title": "58. Смерть Уалида ибн Мугъиры. Продолжение разных военных походов. История убийства мусульманами многобожников в запретный месяц.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_058.mp3"},
+                
+                {"title": "59. Изменение направление Къиблы. Ураза становиться обязательной во втором году хиджры.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_059.mp3"},
+                {"title": "60. События перед битвой «Бадр». Сборы жителей Мекки на битву при Бадре.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_060.mp3"},
+                {"title": "61. Совещание Пророка ﷺ со сподвижникам, перед битвой Бадр.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_061.mp3"},
+                {"title": "62. Подготовка к битве при Бадре мусульман и многобожников.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_062.mp3"},
+                {"title": "63. События в битве при Бадре.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_063.mp3"},
+                {"title": "64. События после битвы при Бадре. Смерть Абу Ляхаба. Как умер Абу Джахль?", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_064.mp3"},
+            ],
+               "questions": [
+                    "Что Пророк ﷺ первым делом приказал сделать по прибытии в Медину?",
+                    "Почему Пророк ﷺ не мог читать стихи?",
+                    "В чьём доме читалась первая пятничная молитва?",
+                    "Сколько степеней было у молитвы и какие?",
+                    "Каким образом в Исламе появился азан?",
+                    "Как называются битвы, в которых Пророк ﷺ участвовал и в которых не участвовал?",
+                    "Кто возглавлял первое отправленное на битву войско?",
+                    "Кто возглавил второе войско?",
+                    "Почему Пророк ﷺ отправляет на битву только мухаджиров, во главе которых стоят люди из племени курайшитов?",
+                    "В какую битву Пророк ﷺ вышел в первый раз? И в каком это было месяце?",
+                    "Кто был первым убитым неверующим в Исламе?",
+                    "В какую сторону мусульмане молились в начале Ислама?",
+                    "В каком году поменялась Къибла?",
+                    "В каком году стал обязательным пост?",
+                    "В каком году и месяце была битва Бадр?",
+                    "Из какого числа состояло войско мусульман при Бадре?",
+                    "Считается ли ложью то, что говоришь, но не имеешь в виду? И как это называется?",
+                    "Кто был одним из первых шахидов, умерших при Бадре?",
+                    "Сколько времени длилась битва при Бадре?",
+                    "Сколько ангелов Всевышний Аллах послал в помощь мусульманам при Бадре?",
+                    "Что Пророк ﷺ сделал с пленными Бадра?",
+                    "Кто убил Абу Джахля?"
+                ]
+            },
+            
+            {
+            "id": 6,
+            "tracks": [
+                {"title": "65. События между битвой Бадр и битовой при Ухуде. Битва Суейк. Замужество Фатымы. Смерть Рукъайи. Поход против племени Гатафан. История войны с племенем Бану Каюнк’а.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_065.mp3"},
+                {"title": "66. События перед битвой Ухуд.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_066.mp3"},
+                {"title": "67. События при битве Ухуд.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_067.mp3"},
+                {"title": "68. События после битвы Ухуд. Поход к Хамра аль-асад.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_068.mp3"},
+                {"title": "69. Поход против Бану Асад. Ислам ‘Амр ибн аль-‘Аса. Женитьба на Зейнаб. Поход на Бир аль-мауна.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_069.mp3"},
+                
+                {"title": "70. Война против Бану Надыр. Поход «Зат ар-рик‘а». Поход «Даумат аль-джандаль». Второй выход к Бадру.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_070.mp3"},
+                {"title": "71. События перед битвой «аль-Ахзаб».", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_071.mp3"},
+                {"title": "72. События при битве «аль-Ахзаб».", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_072.mp3"},
+                {"title": "73. События после битвы «аль-Ахзаб». Поход против племени Бану Курайза.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_073.mp3"},
+                
+            ],
+               "questions": [
+                    "Какой случай стал причиной начала битвы мусульман с евреями?",
+                    "Как звали главу лицемеров?",
+                    "Чем закончилась битва с евреями?",
+                    "Что стало причиной начала битвы Ухуд?",
+                    "Что увидел Пророк ﷺ во сне?",
+                    "Сколько было мусульман при битве «Ухуд»?",
+                    "Кому Пророк ﷺ дал свой меч в битве Ухуд?",
+                    "Что приказал Пророк ﷺ лучникам на горе?",
+                    "Кто нёс знамя мусульман и знамя многобожников во время битвы при Ухуде?",
+                    "Кто тот, кого помыли ангелы после смерти в битве Ухуд?",
+                    "Что стало причиной поражения мусульман?",
+                    "Кто убил Хамзу?",
+                    "Чем закончилась битва Ухуд?",
+                    "Что произошло после битвы Ухуд?",
+                    "Какие военные походы произошли после битвы Ухуд?",
+                    "Кто стал причиной Ислама ‘Амра бну Аль-‘Аса?",
+                    "Что стало причиной тому, что Пророк ﷺ собрал войско и пошёл против евреев Бану Надыр?",
+                    "Как мусульмане в битве с Бану Надыр выманили их из крепости?",
+                    "Как называются трофеи, которые взяты без войны? Каково постановление этих трофеев в Исламе?",
+                    "В какой суре описывается то, что случилось с племенем Бану Надыр?",
+                    "Когда были ниспосланы аяты о молитве страха?",
+                    "Чем завершилась битва с племенем Гатафан?",
+                    "Кто стал причиной битвы «аль-Ахзаб»?",
+                    "Кто предложил рыть рвы при битве «аль-Ахзаб»?",
+                    "Кто пригласил Пророка ﷺ и его сподвижников на обед?",
+                    "Когда разрешается лгать?",
+                    "Кто отправился на другую сторону рвов разузнать новости?",
+                    "Сколько времени длилась битва «аль-Ахзаб»?",
+                    "Мог ли Джибриль, мир ему, превращаться в людей? В кого из сахабов он превращался?",
+                    "Как поняли сахабы слова Пророка ﷺ «пусть не молятся, кроме как у Бану Курайза»?",
+                    "Разрешается ли в основах Ислама какое-либо разногласие?",
+                    "Что Пророк ﷺ сделал с племенем евреев Бану Курайза?",
+                    "В какой суре описывается битва аль-Ахзаб и война с еврейским племенем Бану Курайза?",
+                    "Сколько людей погибло в битве «аль-Ахзаб»?",
+                    "Что Пророк ﷺ решил делать после битвы «аль-Ахзаб»?"
+                ]
+            },
+            
+            {
+            "id": 7,
+            "tracks": [
+                {"title": "74. Наказание племен, принимающих участие в битве «аль-Ахзаб». История принятия Ислама Сумамой.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_074.mp3"},
+                {"title": "75. Поход на Бану Мусталяк. История обвинения ’Аиши, да будет доволен ею Аллах.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_075.mp3"},
+                {"title": "76. Первая ’умра Пророка ﷺ. Присяга под деревом (ар-Ридван). Перемирие при Худайбии.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_076.mp3"},
+                {"title": "77. События перед походом на Хайбар.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_077.mp3"},
+                {"title": "78. События при битве «Хайбар».", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_078.mp3"},
+                {"title": "79. Об условиях поставленных иудеям. О событиях после битвы «Хайбар».", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_079.mp3"}
+            ],
+               "questions": [
+                    "Какая разница между газуа и сария?",
+                    "Какую фразу часто произносил ’Умар?",
+                    "Кто обвинил ’Аишу в прелюбодеянии и с кем из сподвижников?",
+                    "Чем закончилось обвинение ’Аиши?",
+                    "В какой суре рассказывается о невинности ’Аиши?",
+                    "Какое наказание за обвинение в прелюбодеянии, если это ложь?",
+                    "Что должен делать мусульманин, когда слышит что-либо плохое про другого?",
+                    "В каком году Пророк ﷺ в первый раз отправился делать ’умру?",
+                    "Сколько сподвижников отправились делать ’умру с Пророком ﷺ?",
+                    "Как называется место, где человек, совершающий хадж или ’умру, должен одевать ихрам?",
+                    "Зашёл ли Пророк ﷺ на территорию аль-Харама, когда хотел сделать ’умру и почему?",
+                    "Что сказал У’руа ибн Мас’ууд, когда курайшиты отправили его к Пророку ﷺ, чтобы узнать, воевать ли он пришёл или совершить умру?",
+                    "Кого Пророк ﷺ отправил на переговоры в Мекку?",
+                    "Как называется данная под деревом присяга?",
+                    "Какой урок берём из того, что Умар вырубил дерево, под которым была дана присяга Пророку ﷺ?",
+                    "Какие условия были в перемирии с курайшитами?",
+                    "Как называется договор между мусульманами и курайшитами?",
+                    "Что стало причиной разрыва договора?",
+                    "Кто отправился на гъазуа Хайбар?",
+                    "Сколько было мусульман в битве Хайбар?",
+                    "Зачем Пророк ﷺ хотел напасть со стороны севера?",
+                    "Какой урок берём из слов Пророка ﷺ сподвижникам «Потише! Поистине вы не призываете глухого, вы призываете Слышащего»?",
+                    "Что такое «джизья»?",
+                    "Кого Пророк ﷺ назвал своим апостолом?",
+                    "Сколько продолжалась битва с первой крепостью Хайбара?",
+                    "Кому Пророк ﷺ дал знамя после слов «Завтра я дам знамя тому, кого любит Аллах и Его посланник и кто любит Аллаха и Его посланника»?",
+                    "Кто открыл первую крепость «На’ийм»?",
+                    "Каких животных и птиц Пророк ﷺ запретил кушать?",
+                    "Разрешается ли в Исламе временная женитьба?",
+                    "Сколько ударов плетью полагается за распивание спиртного?",
+                    "Можно ли проклинать определённого человека?",
+                    "Кто отравил Пророка ﷺ после битвы Хайбар?",
+                    "Сколько людей погибло в битве Хайбар?"
+                ]
+            },
+            
+            {
+            "id": 8,
+            "tracks": [
+                {"title": "80. Разные военные походы против тех племен, которые учувствовали в битве «аль-Ахзаб».", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_080.mp3"},
+                {"title": "81. Возместительная ‘умра (аль-’умра аль-къада).", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_081.mp3"},
+                {"title": "82. Ислам Халида ибн Уалида. Письма разным правителям. Встреча Абу Суфьяна с Кейсаром.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_082.mp3"},
+                {"title": "83. События перед и при битве при Муъта.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_083.mp3"},
+                {"title": "84. Поход «Зат ас-салясиль» и другие походы после Муъта.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_084.mp3"},
+                {"title": "85. События перед открытием Мекки.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_085.mp3"},
+                
+                {"title": "86. События при открытии Мекки.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_086.mp3"},
+                {"title": "87. События после открытия Мекки. Разрушение идолов вокруг Мекки. История Халида ибн Уалида.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_087.mp3"}
+            ],
+            "questions": [
+                    "Можно ли обвинять мусульманина в неверии или лицемерии?",
+                    "В каком году Пророк ﷺ вышел восполнять ‘умру?",
+                    "Когда является сунной открывать плечо и бежать во время хаджа и ‘умры?",
+                    "Кому из царей Пророк ﷺ отправил своё первое письмо?",
+                    "Какова была религия ‘Исы, мир ему?",
+                    "Принял ли Ислам царь Рима?",
+                    "Принял ли Ислам царь Египта?",
+                    "Кто из царей разорвал письмо Пророка ﷺ?",
+                    "Можно ли отправляться в путешествие в пятницу?",
+                    "Сколько было мусульман и неверующих в битве Муъта с племенем «Гъассасина»?",
+                    "Кто стал последним амиром мусульман в битве Муъта?",
+                    "Кого Пророк ﷺ назвал «мечом Аллаха»?",
+                    "Расскажи о плане Халида при битве Муъта?",
+                    "Какое племя зашло в союз с мусульманами, а какое с многобожниками?",
+                    "Каким образом был нарушен договор «Сульх аль-Худайбийя»?",
+                    "Почему один из сподвижников отправил курайшитам письмо, рассказывая о планах Пророка ﷺ?",
+                    "Какой урок мы берём из разговора Пророка ﷺ с Хатыб ибн Аби Балта’а?",
+                    "Каково было войско мусульман, когда они добрались до Мекки с войной?",
+                    "Кто был последним мухаджиром?",
+                    "Кто из курайшитов сдал Пророку ﷺ Мекку?",
+                    "Принял ли Абу Суфьян Ислам?",
+                    "Какую суру читал Пророк ﷺ когда зашёл в Мекку?",
+                    "Можно ли с чужими женщинами здороваться за руку?",
+                    "В каком году Пророк ﷺ открыл Мекку?",
+                    "Что Пророк ﷺ сделал после открытия Мекки?"
+                ]
+
+            },
+            
+            {
+            "id": 8,
+            "tracks": [
+                {"title": "88. События перед битвой при Хунейне.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_088.mp3"},
+                {"title": "89. Военный поход на Хунейн.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_089.mp3"},
+                {"title": "90. Военный поход на Таиф.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_090.mp3"},
+                {"title": "91. Раздача трофеев Хунейна. Ислам жителей Таифа.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_091.mp3"},
+                {"title": "92. Военный поход на Табук.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_092.mp3"},
+                {"title": "93. События после Табука. История Ка’б ибн Малика, да будет доволен им Аллах.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_093.mp3"},
+                
+                {"title": "94. Наказание лицемеров. Смерть ’Абудуллаха ибн Убайя.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_094.mp3"},
+                {"title": "95. Первый хадж мусульман под управлением Абу Бакра. Приход разных делегаций. Ислам ’Ади ибн Хатима. Делегация из Наджрана.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_095.mp3"},
+                {"title": "96. Отправка Му’аза ибн Джабаля, да будет доволен им Аллах, в Йемен. Нисхождение суры «ан-Наср».", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_096.mp3"},
+                {"title": "97. Хадж Пророка ﷺ.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_097.mp3"},
+                {"title": "98. Нисхождение аята «Сегодня Я сделал полной вашу религию...» Сура «аль-Маида», аят 3. (https://t.me/tafsir_bagawi/605)", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_098.mp3"},
+                {"title": "99. Болезнь Пророка и его смерть, да благословит его Аллах и приветствует.. Хадж Пророка ﷺ.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_099.mp3"},
+                {"title": "100. Присяга Абу Бакру. Похороны Пророка ﷺ. Заключение.", "url": "https://abdurtwhd.ams3.cdn.digitaloceanspaces.com/sira_proroka/sira_086.mp3"},
+            ],
+            "questions": [
+                "Что подвело мусульман в битве Хунейн, что они даже начали убегать?",
+                "Как Всевышний Аллах помог мусульманам в битве Хунейн?",
+                "Какое чудо Пророк ﷺ сделал с Халидом ибн Уалидом в битве Хунейн, когда его ранили?",
+                "В какой суре описывается битва Хунейн?",
+                "Куда отправился Пророк ﷺ после битвы Хунейн?",
+                "Открыл ли Пророк ﷺ замок Таифа?",
+                "В каком году была битва Табук?",
+                "В какой суре говорится о битве Табук?",
+                "Сколько людей собрал Пророк ﷺ в Табук?",
+                "Что Пророк ﷺ велел делать, если проходишь через места погубленных народов?",
+                "Была ли битва Табук?",
+                "Кому Пророк ﷺ назвал имена мунафиков?",
+                "Почему Пророк ﷺ приказал сжечь мечеть?",
+                "Кто был имамом Пророку ﷺ при возвращении из Табука?",
+                "Сколько человек не вышло в битву Табук без причины?",
+                "Что Пророк ﷺ приказал делать с тем, кто не вышел в битву Табук без причины?",
+                "О чем объявил ’Али в первом хадже?",
+                "Кто из близких Пророка ﷺ умер в 9 году?",
+                "Какие качества похвалил Пророк ﷺ в Ахнафе?",
+                "Как звали лжепророка во времена Пророка ﷺ?",
+                "Являются ли законы поклонением?",
+                "Когда и кого Пророк ﷺ отправил в Йемен?",
+                "Почему после «Сульх аль-худайбия» люди толпами принимали Ислам?",
+                "В каком году Пророк ﷺ совершил хадж?",
+                "Можно ли в религию Аллаха вводить что-то новое и почему?",
+                "Что сказал Абу Бакр когда умер Пророк ﷺ?",
+                "Кто стал халифом после Пророка ﷺ?",
+                "Кто бросил свой перстень в могилу Пророка ﷺ и почему?",
+                "Кто лучший человек на земле после пророков?",
+                "Где был похоронен Пророк ﷺ?",
+                "Что значит свидетельство «Мухаммад раб Аллаха и Его посланник» и что оно требует от нас?"
+                ]
+
+            },
+            
+    ]
+
+    paginator = Paginator(pages_data, 1)  # 1 страница на экран
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    elided_pages = paginator.get_elided_page_range(page_obj.number, on_each_side=1, on_ends=2)
+
+    context = {
+        'page_obj': page_obj,
+        'data': page_obj[0],  # Передаем данные конкретной страницы (tracks, questions)
+        'elided_pages': elided_pages,
+    }
+    return render(request, 'sira.html', context)

@@ -1,93 +1,117 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block extra_css %}
-{% endblock %}
-
 {% block content %}
 
-<!-- БАННЕР КАНАЛА -->
+<!-- БАННЕР -->
 <div class="channel-banner">
     <img src="{% static 'img/banner.png' %}" alt="Свет Сунны">
-    <div class="banner-overlay">
-        <h1>Свет Сунны 🌙✨</h1>
-        <p>📖 Куран и Сунна с пониманием  Пророка Мухаммада ﷺ и его сподвижников رضي الله عنهم </p>
-    </div>
 </div>
 
-<!-- ИНФО О КАНАЛЕ (как на YouTube) -->
-<div class="channel-info">
-    <div class="channel-info-avatar">
-        <a href="{% url 'admin_info' %}" class="video-avatar"></a>
-            <img src="{% static 'img/admin-pic.jpeg' %}" alt="Свет Сунны">
-        </a>
+<!-- ПРОФИЛЬ КАНАЛА -->
+<div class="channel-profile">
+    <div class="channel-avatar">
+        <img src="{% static 'img/admin-pic.jpeg' %}" alt="Свет Сунны">
     </div>
-    <div class="channel-info-text">
-        <a href="{% url 'admin_info' %}" class="video-avatar">
-            <h1 class="channel-info-name">
-                Свет Сунны 🌙✨
-                <i class="fas fa-check-circle" title="Проверенный канал"></i>
-            </h1>
-        </a>
-        <div class="channel-info-meta">
-            @svetsunny · Призыв к пониманию первых поколений мусульман
-        </div>
-        <p class="channel-info-desc">
+    <div class="channel-info">
+        <h1 class="channel-title">
+            Свет Сунны 🌙✨
+            <i class="fas fa-check-circle verified"></i>
+        </h1>
+        <p class="channel-handle">@svetsunny · Призыв к пониманию первых поколений мусульман</p>
+        <p class="channel-desc">
             Цель проекта — приблизить верующего к первому поколению мусульман,
-            которое было воспитано на Коране и Сунне. Пролить свет знания
-            о пути Пророка ﷺ и его сподвижников.
+            которое было воспитано на Коране и Сунне. Пролить свет знания о пути
+            Пророка ﷺ и его сподвижников.
         </p>
-        <div class="channel-info-links">
-            <a href="https://t.me/@svettsunny" target="_blank">
-                <i class="fab fa-telegram"></i> t.me/@svettsunny
+        <div class="channel-links">
+            <a href="https://t.me/svettsunny" target="_blank">
+                <i class="fab fa-telegram"></i> t.me/svettsunny
             </a>
-            <a href="https://www.youtube.com/@abdurtwhd" target="_blank">
+            <a href="https://youtube.com/@abdurtwhd" target="_blank">
                 <i class="fab fa-youtube"></i> youtube.com/@abdurtwhd
             </a>
         </div>
-        <div class="channel-info-actions">
-            <button id="subscribe-btn" class="btn-subscribe" type="button">
-                <i class="fas fa-bell"></i>
-                <span id="subscribe-text">Подписаться на уведомления</span>
-            </button>
-        </div>
+        <a href="https://t.me/svettsunny" target="_blank" class="subscribe-btn">
+            <i class="fas fa-bell"></i> Подписаться на уведомления
+        </a>
     </div>
+</div>
+
+<!-- ВКЛАДКИ АВТОРОВ -->
+<div class="channel-tabs">
+    <a href="?{% if q %}q={{ q }}{% endif %}"
+       class="channel-tab {% if not selected_channel %}active{% endif %}">
+        Все <span class="tab-count">{{ total_count }}</span>
+    </a>
+    {% for c in channels %}
+        <a href="?channel={{ c.channel_id }}{% if q %}&q={{ q }}{% endif %}"
+           class="channel-tab {% if c.channel_id == selected_channel %}active{% endif %}">
+            {{ c.channel_name }} <span class="tab-count">{{ c.n }}</span>
+        </a>
+    {% endfor %}
 </div>
 
 <!-- СЕТКА КАРТОЧЕК -->
 <div class="feed-grid">
-    {% for card in cards %}
-    <article class="card" {% if card.bg_color %}style="--card-bg: {{ card.bg_color }}"{% endif %}>
-        <a href="{{ card.get_url }}"
-           {% if card.card_type != 'internal' %}target="_blank" rel="noopener"{% endif %}>
+
+    <!-- ЗАКРЕПЛЁННАЯ КАРТОЧКА "СИРА ПРОРОКА" -->
+    <article class="card card-featured">
+        <a href="{% url 'sira' %}">
             <div class="card-image">
-                {% if card.get_image %}
-                <img src="{{ card.get_image }}" alt="{{ card.title }}" loading="lazy">
-                {% endif %}
+                <img src="{% static 'img/sira.jpg' %}" alt="Сира Пророка Мухаммада ﷺ" loading="lazy">
+            </div>
+            <div class="card-body">
+                <div class="video-details">
+                    <h2 class="video-title">Сира Пророка Мухаммада ﷺ</h2>
+                    <p class="video-meta">Серия аудио лекций об истории Пророка ﷺ</p>
+                    <span class="card-date">Закреплено · Сира</span>
+                </div>
             </div>
         </a>
-        <div class="card-body">
-            <a href="{% url 'admin_info' %}" class="video-avatar">
-                <img src="{% static 'img/admin-pic.jpeg' %}" alt="Свет Сунны">
-            </a>
-            <div class="video-details">
-                <a href="{{ card.get_url }}"
-                   {% if card.card_type != 'internal' %}target="_blank" rel="noopener"{% endif %}>
-                    <h2 class="video-title">{{ card.title }}</h2>
-                    <p class="video-meta">{{ card.description }}</p>
-                    <span class="card-date">
-                        <i class="fa-regular fa-calendar"></i>
-                        {{ card.published|date:"d.m.Y" }}
-                    </span>
-                </a>
+    </article>
+
+    {% for card in page_obj %}
+    <article class="card">
+        <a href="{{ card.url }}" target="_blank" rel="noopener">
+            <div class="card-image">
+                <img src="{{ card.image_url }}" alt="{{ card.title }}" loading="lazy">
+                {% if card.duration %}
+                    <span class="video-duration">{{ card.duration }}</span>
+                {% endif %}
             </div>
-        </div>
+            <div class="card-body">
+                <div class="video-details">
+                    <h2 class="video-title">{{ card.title }}</h2>
+                    <p class="video-meta">{{ card.channel_name }}</p>
+                    <span class="card-date">{{ card.published|date:"d.m.Y" }}</span>
+                </div>
+            </div>
+        </a>
     </article>
     {% empty %}
-    <p style="color: var(--text-muted); grid-column: 1 / -1;">
-        Пока нет карточек. Запустите парсер: <code>python manage.py parse_youtube</code>
-    </p>
+    <p class="empty">Ничего не найдено.</p>
     {% endfor %}
 </div>
+
+<!-- ПАГИНАЦИЯ -->
+{% if page_obj.has_other_pages %}
+<nav class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1{% if q %}&q={{ q }}{% endif %}{% if selected_channel %}&channel={{ selected_channel }}{% endif %}">« Первая</a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_channel %}&channel={{ selected_channel }}{% endif %}">← Назад</a>
+    {% endif %}
+
+    <span class="pagination-info">
+        Стр. {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+        ({{ page_obj.paginator.count }} видео)
+    </span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_channel %}&channel={{ selected_channel }}{% endif %}">Вперёд →</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}{% if q %}&q={{ q }}{% endif %}{% if selected_channel %}&channel={{ selected_channel }}{% endif %}">Последняя »</a>
+    {% endif %}
+</nav>
+{% endif %}
 
 {% endblock %}

@@ -8,43 +8,53 @@
 {% block content %}
 <article class="article-card">
     <h1 class="article-title">Сира Пророка Мухаммада ﷺ</h1>
-    
-    <div class="article-image"><img src="{% static 'img/sira.jpg' %}"></div>
-    
+
+    <div class="article-image">
+        <img src="{% static 'img/sira.jpg' %}" alt="Сира Пророка Мухаммада ﷺ">
+    </div>
+
     <div class="article-text">
-        <p>С именем Аллаха Милостивого, Милующего!
-            🔈Серия аудио лекций на тему «История Пророка Мухаммада, да благословит его Аллах и приветствует.
+        <p>
+            С именем Аллаха Милостивого, Милующего! 🔈<br>
+            Серия аудио лекций на тему «История Пророка Мухаммада, да благословит его Аллах и приветствует».
             Запись сделана в 2001-м году, полностью переработана и отредактирована.
         </p>
     </div>
 
     <div class="audio-section">
 
-        <a href="https://t.me/istoriya_proroka" class="btn-download" target='blank'>
-            <i class="fa-brands fa-telegram"> </i> Telegram
+        <a href="https://t.me/istoriya_proroka" class="btn-download" target="_blank">
+            <i class="fab fa-telegram"></i> Telegram
+        </a>
+        <a href="https://youtube.com/playlist?list=PLRFJeQnBC-ymqYjYb6OnoxeGxJQdoxyFO" class="btn-download" target="_blank">
+            <i class="fab fa-youtube"></i> YouTube
         </a>
 
-        <a href="https://youtube.com/playlist?list=PLRFJeQnBC-ymqYjYb6OnoxeGxJQdoxyFO&si=Ewf_F11u7Fy3m97W" class="btn-download" target='blank'>
-            <i class="fa-brands fa-youtube"> </i> YouTube
-        </a>
+        {# ТРЕКИ #}
+        {% if data.tracks %}
+            {% for track in data.tracks %}
+                <div class="audio-item">
+                    <div class="audio-info">
+                        <p>{{ track.title }}</p>
+                    </div>
+                    <audio controls preload="none" src="{{ track.url }}" class="sira-audio"></audio>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="color:#aaa;">Нет треков на этой странице.</p>
+        {% endif %}
 
-        {% for track in data.tracks %}
-            <div class="audio-item">
-                <div class="audio-info"><p>{{ track.title }}</p></div>
-                <audio controls src="{{ track.url }}" class="sira-audio"></audio>
-            </div>
-        {% endfor %}
-
+        {# ПАГИНАЦИЯ #}
         <div class="pagination-container">
             <div class="page-status">
                 Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
             </div>
-            
+
             <div class="step-links">
                 <div class="page-numbers">
                     {% for num in elided_pages %}
                         {% if num == page_obj.paginator.ELLIPSIS %}
-                            <span class="page-btn ellipsis">...</span>
+                            <span class="page-btn ellipsis">…</span>
                         {% elif num == page_obj.number %}
                             <span class="page-btn active">{{ num }}</span>
                         {% else %}
@@ -53,25 +63,30 @@
                     {% endfor %}
                 </div>
 
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}" class="page-btn nav-btn">‹</a>
+                {% endif %}
                 {% if page_obj.has_next %}
                     <a href="?page={{ page_obj.next_page_number }}" class="page-btn nav-btn">›</a>
                 {% endif %}
             </div>
         </div>
-        
     </div>
 
-    <div class="control-questions-card">
-        <div class="card-header">
-            <span class="icon">📘</span>
-            <h3>Контрольные вопросы (Часть {{ page_obj.number }})</h3>
+    {# ВОПРОСЫ #}
+    {% if data.questions %}
+        <div class="control-questions-card">
+            <div class="card-header">
+                <span class="icon">📘</span>
+                <h3>Контрольные вопросы (Часть {{ page_obj.number }})</h3>
+            </div>
+            <ol class="questions-list">
+                {% for question in data.questions %}
+                    <li>{{ question }}</li>
+                {% endfor %}
+            </ol>
         </div>
-        <ol class="questions-list">
-            {% for question in data.questions %}
-                <li>{{ question }}</li>
-            {% endfor %}
-        </ol>
-    </div>
+    {% endif %}
 
 </article>
 {% endblock %}

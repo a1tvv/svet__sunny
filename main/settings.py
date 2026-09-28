@@ -131,7 +131,12 @@ DATABASES = {
 # сразу после SECRET_KEY
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# YouTube: показ ссылки на новое видео канала "К Исламу"
-YOUTUBE_CHANNEL_ID = os.getenv('YOUTUBE_CHANNEL_ID', '')
+# YouTube: список каналов для парсера (ID через запятую в .env)
+YOUTUBE_CHANNEL_IDS = [
+    cid.strip()
+    for cid in os.getenv('YOUTUBE_CHANNEL_IDS', '').split(',')
+    if cid.strip()
+]
+YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY', '')
 NEW_VIDEO_DISPLAY_DAYS = 2
 CRON_SECRET = os.getenv('CRON_SECRET', '')

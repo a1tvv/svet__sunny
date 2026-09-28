@@ -19,7 +19,13 @@ class Card(models.Model):
     bg_color = models.CharField('Фон карточки', max_length=20, blank=True, help_text='Например #f8c512')
     order = models.IntegerField('Порядок', default=0)
     is_active = models.BooleanField('Активна', default=True)
-    published = models.DateField('Дата', auto_now_add=True)
+    published = models.DateField('Дата', null=True, blank=True)
+    duration = models.CharField(max_length=16, blank=True)
+
+    # новые поля для парсера
+    channel_id = models.CharField(max_length=64, blank=True, db_index=True)
+    channel_name = models.CharField(max_length=255, blank=True)
+    video_id = models.CharField(max_length=32, blank=True, db_index=True)
 
     class Meta:
         ordering = ['order', '-published']

@@ -12,6 +12,7 @@
     --hover-bg: #272727;
     --border-color: #272727;
     --card-bg: #272727;
+    --featured-bg: #f5d547;
 }
 
 /* ========== БАЗА ========== */
@@ -40,7 +41,6 @@ img { max-width: 100%; display: block; }
     display: flex;
     align-items: center;
 }
-
 .header-content {
     display: flex;
     justify-content: space-between;
@@ -48,14 +48,12 @@ img { max-width: 100%; display: block; }
     width: 100%;
     gap: 16px;
 }
-
 .left-group {
     display: flex;
     align-items: center;
     gap: 16px;
     flex-shrink: 0;
 }
-
 .menu-toggle {
     display: none;
     background: none;
@@ -75,7 +73,7 @@ img { max-width: 100%; display: block; }
     white-space: nowrap;
 }
 
-/* ========== ПОИСК ========== */
+/* ========== ПОИСК В ШАПКЕ ========== */
 .search-bar {
     display: flex;
     align-items: stretch;
@@ -84,7 +82,6 @@ img { max-width: 100%; display: block; }
     margin: 0 auto;
     height: 40px;
 }
-
 .search-bar input {
     flex: 1;
     background-color: #121212;
@@ -99,7 +96,6 @@ img { max-width: 100%; display: block; }
 }
 .search-bar input::placeholder { color: #888; }
 .search-bar input:focus { border-color: var(--accent-blue); }
-
 .search-bar button {
     background-color: #222;
     border: 1px solid #303030;
@@ -123,7 +119,6 @@ img { max-width: 100%; display: block; }
     gap: 10px;
     flex-shrink: 0;
 }
-
 .nav-link {
     color: var(--text-main);
     font-weight: 500;
@@ -133,7 +128,6 @@ img { max-width: 100%; display: block; }
     transition: background-color 0.2s;
 }
 .nav-link:hover { background-color: var(--hover-bg); }
-
 .tg-link {
     background-color: var(--accent-blue);
     color: #0f0f0f !important;
@@ -165,7 +159,6 @@ img { max-width: 100%; display: block; }
     background-color: #555;
     border-radius: 4px;
 }
-
 .sidebar-nav h3 {
     font-size: 0.9rem;
     color: var(--text-muted);
@@ -174,7 +167,6 @@ img { max-width: 100%; display: block; }
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
-
 .sidebar-link {
     display: flex;
     align-items: center;
@@ -186,7 +178,6 @@ img { max-width: 100%; display: block; }
     margin-bottom: 2px;
 }
 .sidebar-link:hover { background-color: var(--hover-bg); }
-
 .sidebar-link .icon-wrapper {
     width: 24px;
     height: 24px;
@@ -200,7 +191,6 @@ img { max-width: 100%; display: block; }
     height: 100%;
     object-fit: cover;
 }
-
 .sidebar-link span {
     font-size: 0.9rem;
     white-space: nowrap;
@@ -226,33 +216,14 @@ img { max-width: 100%; display: block; }
     margin-bottom: 20px;
     background-color: #272727;
 }
-.channel-banner img { width: 100%; height: 100%; object-fit: cover; }
-
-.banner-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.75) 100%);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 24px 32px;
-}
-.banner-overlay h1 {
-    margin: 0 0 8px 0;
-    font-size: 28px;
-    font-weight: 700;
-    color: #fff;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-}
-.banner-overlay p {
-    margin: 0;
-    font-size: 15px;
-    color: #e0e0e0;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+.channel-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-/* ========== ИНФО О КАНАЛЕ ========== */
-.channel-info {
+/* ========== ПРОФИЛЬ КАНАЛА ========== */
+.channel-profile {
     display: flex;
     align-items: flex-start;
     gap: 24px;
@@ -260,20 +231,25 @@ img { max-width: 100%; display: block; }
     margin-bottom: 28px;
     border-bottom: 1px solid var(--border-color);
 }
-
-.channel-info-avatar {
+.channel-avatar {
     width: 128px;
     height: 128px;
     border-radius: 50%;
     overflow: hidden;
     flex-shrink: 0;
     background: #333;
+    border: 2px solid var(--border-color);
 }
-.channel-info-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-.channel-info-text { flex: 1; min-width: 0; }
-
-.channel-info-name {
+.channel-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.channel-info {
+    flex: 1;
+    min-width: 0;
+}
+.channel-title {
     font-size: 26px;
     font-weight: 700;
     color: #fff;
@@ -283,18 +259,16 @@ img { max-width: 100%; display: block; }
     gap: 10px;
     line-height: 1.2;
 }
-.channel-info-name .fa-check-circle {
-    font-size: 15px;
+.channel-title .verified {
     color: var(--text-muted);
+    font-size: 15px;
 }
-
-.channel-info-meta {
+.channel-handle {
     font-size: 14px;
     color: var(--text-muted);
-    margin-bottom: 10px;
+    margin: 0 0 10px;
 }
-
-.channel-info-desc {
+.channel-desc {
     font-size: 14px;
     color: var(--text-muted);
     line-height: 1.5;
@@ -305,35 +279,41 @@ img { max-width: 100%; display: block; }
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
-.channel-info-more {
-    color: var(--text-main);
-    font-weight: 500;
-    margin-left: 4px;
-}
-.channel-info-more:hover { text-decoration: underline; }
-
-.channel-info-links {
+.channel-links {
     display: flex;
     flex-wrap: wrap;
     gap: 16px;
     margin-bottom: 16px;
     font-size: 13px;
 }
-.channel-info-links a {
+.channel-links a {
     color: var(--accent-blue);
     display: inline-flex;
     align-items: center;
     gap: 6px;
 }
-.channel-info-links a:hover { text-decoration: underline; }
+.channel-links a:hover { text-decoration: underline; }
 
-.channel-info-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+.subscribe-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: 22px;
+    background: #fff;
+    color: #0f0f0f;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    white-space: nowrap;
+    transition: background-color 0.2s, transform 0.1s;
 }
+.subscribe-btn:hover { background: #d9d9d9; transform: translateY(-1px); }
+.subscribe-btn:active { transform: scale(0.97); }
 
-/* ========== КНОПКИ ========== */
+/* ========== КНОПКИ (совместимость) ========== */
 .btn-subscribe,
 .btn-secondary {
     display: inline-flex;
@@ -347,35 +327,10 @@ img { max-width: 100%; display: block; }
     cursor: pointer;
     border: none;
     white-space: nowrap;
-    transition: background-color 0.2s, color 0.2s, transform 0.1s, box-shadow 0.2s;
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
+    transition: background-color 0.2s, color 0.2s, transform 0.1s;
 }
-
-.btn-subscribe {
-    background: #fff;
-    color: #0f0f0f;
-}
+.btn-subscribe { background: #fff; color: #0f0f0f; }
 .btn-subscribe:hover { background: #d9d9d9; transform: translateY(-1px); }
-.btn-subscribe:active { transform: scale(0.97); }
-.btn-subscribe .fa-bell { font-size: 14px; transition: color 0.25s; }
-
-.btn-subscribe.btn-subscribed {
-    background: #272727;
-    color: #f1f1f1;
-    border: 1px solid var(--accent-blue);
-    box-shadow: 0 0 0 0 rgba(62,166,255,0.5);
-    animation: subscribedGlow 2s ease-out;
-}
-.btn-subscribe.btn-subscribed .fa-bell { color: var(--accent-blue); }
-
-@keyframes subscribedGlow {
-    0%   { box-shadow: 0 0 0 0 rgba(62,166,255,0.7); }
-    70%  { box-shadow: 0 0 0 14px rgba(62,166,255,0); }
-    100% { box-shadow: 0 0 0 0 rgba(62,166,255,0); }
-}
-
 .btn-secondary {
     background: var(--hover-bg);
     color: var(--text-main);
@@ -384,6 +339,34 @@ img { max-width: 100%; display: block; }
 }
 .btn-secondary:hover { background: #3f3f3f; }
 
+
+/* ========== ЗАКРЕПЛЁННАЯ КАРТОЧКА "СИРА" (ЖЁЛТАЯ) ========== */
+.card.card-featured {
+    background: var(--featured-bg) !important;
+    border-radius: 12px;
+    padding: 8px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.card.card-featured:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 213, 71, 0.35);
+}
+.card.card-featured .card-image {
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+.card.card-featured .video-title {
+    color: #0f0f0f;
+    font-weight: 600;
+}
+.card.card-featured .video-meta {
+    color: #333;
+}
+.card.card-featured .card-date {
+    color: #555;
+}
+
+
 /* ========== СЕТКА КАРТОЧЕК ========== */
 .feed-grid {
     display: grid;
@@ -391,16 +374,16 @@ img { max-width: 100%; display: block; }
     gap: 28px 16px;
     align-items: start;
 }
-
 .card {
     background: transparent;
-    overflow: hidden;
     cursor: pointer;
     transition: transform 0.15s ease;
 }
 .card:hover { transform: translateY(-2px); }
 
+/* Превью + длительность */
 .card-image {
+    position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
     background-color: var(--card-bg);
@@ -409,30 +392,34 @@ img { max-width: 100%; display: block; }
     margin-bottom: 12px;
 }
 .card-image img {
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     transition: opacity 0.2s;
 }
 .card:hover .card-image img { opacity: 0.85; }
 
-.card-body { display: flex; gap: 12px; align-items: flex-start; }
-
-.video-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    overflow: hidden;
-    flex-shrink: 0;
-    background-color: #333;
-    margin-top: 2px;
-    transition: transform 0.15s, box-shadow 0.15s;
-}
-.video-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.video-avatar:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 2px var(--accent-blue);
+.video-duration {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+    z-index: 2;
+    line-height: 1.4;
+    letter-spacing: 0.5px;
 }
 
+/* Тело карточки */
+.card-body {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
 .video-details {
     display: flex;
     flex-direction: column;
@@ -440,7 +427,6 @@ img { max-width: 100%; display: block; }
     flex: 1;
     min-width: 0;
 }
-
 .video-title {
     font-size: 15px;
     font-weight: 500;
@@ -453,18 +439,15 @@ img { max-width: 100%; display: block; }
     overflow: hidden;
     word-break: break-word;
 }
-
 .video-meta {
     font-size: 13px;
     color: var(--text-muted);
     margin: 0;
     line-height: 1.3;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
 }
-
 .card-date {
     font-size: 13px;
     color: var(--text-muted);
@@ -474,7 +457,95 @@ img { max-width: 100%; display: block; }
 }
 .card-date i { font-size: 11px; opacity: 0.7; }
 
-/* ========== ОВЕРЛЕЙ ========== */
+/* ========== ПОИСК НА СТРАНИЦЕ ========== */
+.search-bar-page {
+    display: flex;
+    gap: 12px;
+    padding: 16px 0;
+    margin-bottom: 8px;
+}
+.search-bar-page input[type="text"] {
+    flex: 1;
+    background: #121212;
+    border: 1px solid #303030;
+    color: var(--text-main);
+    padding: 10px 16px;
+    border-radius: 20px;
+    outline: none;
+    font-size: 15px;
+}
+.search-bar-page input[type="text"]:focus { border-color: var(--accent-blue); }
+.search-bar-page button {
+    background: var(--hover-bg);
+    color: var(--text-main);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.2s, color 0.2s;
+}
+.search-bar-page button:hover {
+    background: var(--accent-blue);
+    color: #0f0f0f;
+}
+
+/* ========== ВКЛАДКИ КАНАЛОВ ========== */
+.channel-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 12px 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.channel-tabs::-webkit-scrollbar { display: none; }
+.channel-tab {
+    white-space: nowrap;
+    background: var(--hover-bg);
+    color: var(--text-main);
+    padding: 8px 16px;
+    border-radius: 18px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+.channel-tab:hover { background: #3f3f3f; }
+.channel-tab.active { background: #f1f1f1; color: #0f0f0f; }
+.tab-count { color: var(--text-muted); font-size: 12px; margin-left: 4px; }
+.channel-tab.active .tab-count { color: #606060; }
+
+/* ========== ПАГИНАЦИЯ ========== */
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 32px 0;
+    color: var(--text-main);
+}
+.pagination a {
+    background: var(--hover-bg);
+    color: var(--text-main);
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: background 0.2s, color 0.2s;
+}
+.pagination a:hover { background: var(--accent-blue); color: #0f0f0f; }
+.pagination-info { color: var(--text-muted); font-size: 14px; }
+
+.empty {
+    color: var(--text-muted);
+    padding: 24px;
+    grid-column: 1 / -1;
+    text-align: center;
+}
+
+/* ========== ОВЕРЛЕЙ МЕНЮ ========== */
 .menu-overlay {
     display: none;
     position: fixed;
@@ -482,7 +553,7 @@ img { max-width: 100%; display: block; }
     left: 0;
     width: 100%;
     height: calc(100% - 56px);
-    background: rgba(0,0,0,0.6);
+    background: rgba(0, 0, 0, 0.6);
     z-index: 1500;
 }
 .menu-overlay.active { display: block; }
@@ -507,10 +578,8 @@ img { max-width: 100%; display: block; }
    ============================================================ */
 @media (max-width: 900px) {
 
-    /* --- ШАПКА --- */
     .menu-toggle { display: block; }
     .brand { display: none; }
-
     .search-bar {
         flex: 1;
         max-width: none;
@@ -520,71 +589,45 @@ img { max-width: 100%; display: block; }
     .search-bar input { font-size: 14px; padding: 0 12px; }
     .search-bar button { padding: 0 14px; }
     .search-bar button i { font-size: 13px; }
-
     .right-group .tg-link { display: none; }
 
-    /* --- БАННЕР --- */
     .channel-banner {
-        height: 180px;
+        height: 160px;
         border-radius: 12px;
         margin-bottom: 16px;
     }
-    .banner-overlay { padding: 16px 20px; }
-    .banner-overlay h1 { font-size: 20px; }
-    .banner-overlay p { font-size: 13px; }
 
-    /* --- ИНФО О КАНАЛЕ (левое выравнивание, как на YouTube) --- */
-    .channel-info {
+    .channel-profile {
         flex-direction: column;
-        align-items: flex-start;    /* ← прижимаем влево */
-        text-align: left;           /* ← и текст тоже */
+        align-items: flex-start;
+        text-align: left;
         gap: 14px;
         padding: 16px 0 20px;
         margin-bottom: 20px;
     }
-
-    .channel-info-avatar {
-        width: 96px;
-        height: 96px;
-    }
-
-    .channel-info-name {
+    .channel-avatar { width: 96px; height: 96px; }
+    .channel-title {
         font-size: 20px;
-        justify-content: flex-start; /* ← имя слева */
+        justify-content: flex-start;
     }
+    .channel-desc { font-size: 13px; max-width: 100%; }
+    .channel-links { justify-content: flex-start; }
 
-    .channel-info-desc {
-        font-size: 13px;
-        max-width: 100%;
-    }
-
-    .channel-info-links,
-    .channel-info-actions {
-        justify-content: flex-start; /* ← ссылки и кнопки слева */
-        width: 100%;
-    }
-
-    /* Кнопки: не растягиваются, идут в ряд */
-    .btn-subscribe,
-    .btn-secondary {
-        width: auto;
-        max-width: none;
-        flex: 0 0 auto;
+    .subscribe-btn {
         padding: 9px 16px;
         font-size: 13px;
-        white-space: nowrap;
     }
 
-    /* --- СЕТКА КАРТОЧЕК --- */
     .feed-grid {
         grid-template-columns: 1fr;
         gap: 20px;
     }
 
-    /* --- КОНТЕНТ --- */
+    .card.card-featured { padding: 6px; }
+
+
     .main-content { padding: 16px; }
 
-    /* --- САЙДБАР (слайдер) --- */
     .sidebar-nav {
         position: fixed;
         left: -280px;
@@ -592,24 +635,16 @@ img { max-width: 100%; display: block; }
         width: 280px;
         height: calc(100vh - 56px);
         background-color: #212121;
-        box-shadow: 4px 0 15px rgba(0,0,0,0.7);
+        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.7);
         transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         padding: 0;
     }
     .sidebar-nav.active { left: 0; }
-
     .sidebar-nav .sidebar-scroll {
-        padding: 12px 0 0 0;
+        padding: 12px 0 80px 0;
         display: flex;
         flex-direction: column;
     }
-    .sidebar-nav .sidebar-scroll::after {
-        content: '';
-        display: block;
-        height: 80px;
-        flex-shrink: 0;
-    }
-
     .sidebar-nav .sidebar-link {
         padding: 12px 24px;
         gap: 20px;
@@ -630,66 +665,8 @@ img { max-width: 100%; display: block; }
         margin: 24px 24px 8px 24px;
         color: #888;
     }
-}
 
-/* ============================================================
-   АНИМАЦИИ ПОДПИСКИ (ripple, spark, звон)
-   ============================================================ */
-.btn-subscribe .fa-bell.ringing {
-    animation: bellRing 0.9s cubic-bezier(0.36, 0.07, 0.19, 0.97);
-    transform-origin: top center;
-    display: inline-block;
-}
-@keyframes bellRing {
-    0%, 100% { transform: rotate(0); }
-    10% { transform: rotate(14deg); }
-    20% { transform: rotate(-12deg); }
-    30% { transform: rotate(10deg); }
-    40% { transform: rotate(-8deg); }
-    50% { transform: rotate(6deg); }
-    60% { transform: rotate(-4deg); }
-    70% { transform: rotate(2deg); }
-    80% { transform: rotate(-1deg); }
-}
-
-.btn-subscribe .ripple {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(62,166,255,0.5);
-    transform: scale(0);
-    animation: rippleEffect 0.7s ease-out;
-    pointer-events: none;
-    z-index: 0;
-}
-@keyframes rippleEffect {
-    to { transform: scale(4); opacity: 0; }
-}
-
-.btn-subscribe.pulse::before {
-    content: '';
-    position: absolute;
-    inset: -3px;
-    border-radius: 25px;
-    background: radial-gradient(circle, rgba(62,166,255,0.5) 0%, transparent 70%);
-    animation: pulseGlow 1.2s ease-out;
-    pointer-events: none;
-    z-index: -1;
-}
-@keyframes pulseGlow {
-    0%   { transform: scale(0.9); opacity: 0.8; }
-    100% { transform: scale(1.6); opacity: 0; }
-}
-
-.spark {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    background: var(--accent-blue);
-    border-radius: 50%;
-    pointer-events: none;
-    animation: sparkFly 0.8s ease-out forwards;
-}
-@keyframes sparkFly {
-    0%   { transform: translate(0, 0) scale(1); opacity: 1; }
-    100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+    .search-bar-page { padding: 12px 0; }
+    .channel-tabs { padding: 10px 0; }
+    .pagination { padding: 24px 0; }
 }

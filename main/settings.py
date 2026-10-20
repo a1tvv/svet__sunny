@@ -7,12 +7,18 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-default-key')
+ON_VERCEL = 'VERCEL' in os.environ
 
-# На Vercel DEBUG будет выключен
-DEBUG = False
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', '')
+if not SECRET_KEY:
+    if ON_VERCEL:
+        raise RuntimeError('Не задана переменная окружения DJANGO_SECRET_KEY')
+    SECRET_KEY = 'django-insecure-local-key'
 
-if 'VERCEL' in os.environ:
+# Локально включается через DJANGO_DEBUG=1, на Vercel всегда выключен
+DEBUG = os.getenv('DJANGO_DEBUG') == '1' and not ON_VERCEL
+
+if ON_VERCEL:
     ALLOWED_HOSTS = [
         'nur-as-sunnah.com',
         'www.nur-as-sunnah.com',
@@ -22,7 +28,7 @@ if 'VERCEL' in os.environ:
     ]
 else:
     ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-    
+
 CSRF_TRUSTED_ORIGINS = [
     'https://nur-as-sunnah.com',
     'https://www.nur-as-sunnah.com',
@@ -39,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'storages',
     'main',
-    'content', # Твое приложение
+    'content',
 ]
 
 MIDDLEWARE = [
@@ -79,16 +85,13 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-LANGUAGE_CODE = 'ru-ru' # Поменяла на русский, раз проект на русском
+LANGUAGE_CODE = 'ru-ru'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
 
 STATIC_URL = '/static/'
-# Это поможет WhiteNoise правильно собирать файлы на Vercel
-WHITENOISE_KEEP_ONLY_HASHED_FILES = True
-
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
@@ -103,32 +106,26 @@ AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 AWS_DEFAULT_ACL = 'public-read'
 AWS_QUERYSTRING_AUTH = False
 
-# 1. Изменяем хранилище статики как в RentUi
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.StaticFilesStorage", # Убрали CompressedManifest
+        "BACKEND": "whitenoise.storage.StaticFilesStorage",
     },
 }
 
-# 2. Добавляем параметры WhiteNoise из твоего примера
 WHITENOISE_USE_FINDERS = True
 WHITENOISE_MANIFEST_STRICT = False
-
-
-import dj_database_url
 
 DATABASES = {
     'default': dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600,
-        ssl_require='VERCEL' in os.environ,
+        ssl_require=ON_VERCEL,
     )
 }
 
-# сразу после SECRET_KEY
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # YouTube: список каналов для парсера (ID через запятую в .env)
@@ -140,3 +137,10 @@ YOUTUBE_CHANNEL_IDS = [
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY', '')
 NEW_VIDEO_DISPLAY_DAYS = 2
 CRON_SECRET = os.getenv('CRON_SECRET', '')
+
+if ON_VERCEL:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30

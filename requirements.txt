@@ -1,4 +1,4 @@
-django==5.0.6
+django>=5.1,<5.2
 asgiref
 sqlparse
 whitenoise
@@ -9,3 +9,4 @@ feedparser
 requests
 dj-database-url
 psycopg2-binary
+pillow

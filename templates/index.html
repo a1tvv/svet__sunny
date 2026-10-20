@@ -40,12 +40,12 @@
 
 <!-- ВКЛАДКИ АВТОРОВ -->
 <div class="channel-tabs">
-    <a href="?{% if q %}q={{ q }}{% endif %}"
+    <a href="?{{ search_query }}"
        class="channel-tab {% if not selected_channel %}active{% endif %}">
         Все <span class="tab-count">{{ total_count }}</span>
     </a>
     {% for c in channels %}
-        <a href="?channel={{ c.channel_id }}{% if q %}&q={{ q }}{% endif %}"
+        <a href="?channel={{ c.channel_id|urlencode }}{% if search_query %}&{{ search_query }}{% endif %}"
            class="channel-tab {% if c.channel_id == selected_channel %}active{% endif %}">
             {{ c.channel_name }} <span class="tab-count">{{ c.n }}</span>
         </a>
@@ -75,7 +75,7 @@
     <article class="card">
         <a href="{{ card.url }}" target="_blank" rel="noopener">
             <div class="card-image">
-                <img src="{{ card.image_url }}" alt="{{ card.title }}" loading="lazy">
+                <img src="{{ card.get_image }}" alt="{{ card.title }}" loading="lazy">
                 {% if card.duration %}
                     <span class="video-duration">{{ card.duration }}</span>
                 {% endif %}
@@ -98,8 +98,8 @@
 {% if page_obj.has_other_pages %}
 <nav class="pagination">
     {% if page_obj.has_previous %}
-        <a href="?page=1{% if q %}&q={{ q }}{% endif %}{% if selected_channel %}&channel={{ selected_channel }}{% endif %}">« Первая</a>
-        <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_channel %}&channel={{ selected_channel }}{% endif %}">← Назад</a>
+        <a href="?{% if page_query %}{{ page_query }}&{% endif %}page=1">« Первая</a>
+        <a href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page_obj.previous_page_number }}">← Назад</a>
     {% endif %}
 
     <span class="pagination-info">
@@ -108,8 +108,8 @@
     </span>
 
     {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_channel %}&channel={{ selected_channel }}{% endif %}">Вперёд →</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}{% if q %}&q={{ q }}{% endif %}{% if selected_channel %}&channel={{ selected_channel }}{% endif %}">Последняя »</a>
+        <a href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page_obj.next_page_number }}">Вперёд →</a>
+        <a href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Последняя »</a>
     {% endif %}
 </nav>
 {% endif %}

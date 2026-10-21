@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="388" height="120" viewBox="0 0 388 120" role="img" aria-label="Instagram: @abdurtwhd">
+<defs><linearGradient id="tile" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#161618"/><stop offset="1" stop-color="#000000"/></linearGradient><linearGradient id="ic" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d48cff"/><stop offset="1" stop-color="#7d3bd1"/></linearGradient></defs>
+<g font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<rect x="0.5" y="0.5" width="387" height="119" rx="26" fill="url(#tile)" stroke="#ffffff" stroke-opacity="0.1"/><rect x="22" y="22" width="76" height="76" rx="19" fill="url(#ic)"/><rect x="22.5" y="22.5" width="75" height="75" rx="19" fill="none" stroke="#ffffff" stroke-opacity="0.18"/><rect x="36" y="38" width="48" height="48" rx="14" fill="none" stroke="#ffffff" stroke-width="5"/><circle cx="60" cy="62" r="11" fill="none" stroke="#ffffff" stroke-width="5"/><circle cx="74" cy="48" r="3.5" fill="#ffffff"/><text x="116" y="54" font-size="21" font-weight="500" fill="#86868b">Instagram</text><text x="116" y="86" font-size="25" font-weight="600" fill="#f5f5f7">@abdurtwhd</text>
+</g>
+</svg>

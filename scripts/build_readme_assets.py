@@ -65,12 +65,9 @@ def banner():
         '<circle cx="443" cy="53" r="8" fill="#30d158"><animate attributeName="opacity" values="1;0.35;1" dur="2.4s" repeatCount="indefinite"/></circle>'
         '<text x="466" y="59.5" font-size="18" font-weight="600" fill="#ffffff">nur-as-sunnah.com</text>'
         '<text x="772" y="59.5" font-size="18" font-weight="600" fill="#30d158" text-anchor="end">online</text>'
-        '<text x="600" y="206" text-anchor="middle" font-size="28" font-weight="600" fill="url(#aiText)">Призыв к пониманию первых поколений мусульман</text>'
         + moon(268, 292, 52, 'url(#aiText)') +
-        '<text x="640" y="318" text-anchor="middle" font-size="112" font-weight="700" letter-spacing="-3" fill="url(#titanium)">Свет Сунны</text>'
-        '<text x="600" y="392" text-anchor="middle" font-size="36" font-weight="600" fill="#86868b">Уроки. Поиск. Сира Пророка.</text>'
-        '<text x="600" y="466" text-anchor="middle" font-size="26" font-weight="500" fill="#2997ff">Открыть сайт ›</text>')
-    save('banner.svg', 1200, 600, 'Свет Сунны — призыв к пониманию первых поколений мусульман', defs, body)
+        '<text x="640" y="318" text-anchor="middle" font-size="112" font-weight="700" letter-spacing="-3" fill="url(#titanium)">Свет Сунны</text>')
+    save('banner.svg', 1200, 600, 'Свет Сунны', defs, body)
 
 
 # ───────────────────────── заголовки секций ─────────────────────────
@@ -159,34 +156,6 @@ def stack(groups):
     save('stack.svg', 1200, y - 12, 'Стек: ' + ', '.join(c for _, cs in groups for c in cs), defs, body)
 
 
-# ───────────────────────── терминал ─────────────────────────
-
-def terminal(name, label, title_text, lines):
-    """lines: список строк-списков (текст, цвет); пустой список — пропуск строки."""
-    h = 60 + 40 + len(lines) * 36 + 16
-    defs = TILE
-    body = (f'<rect x="0.5" y="0.5" width="1199" height="{h - 1}" rx="23.5" fill="url(#tile)" stroke="#ffffff" stroke-opacity="0.1"/>'
-            '<rect x="1" y="1" width="1198" height="59" rx="23" fill="#ffffff" fill-opacity="0.04"/>'
-            '<line x1="1" y1="60.5" x2="1199" y2="60.5" stroke="#ffffff" stroke-opacity="0.08"/>'
-            '<circle cx="34" cy="30" r="7" fill="#ff5f57"/><circle cx="58" cy="30" r="7" fill="#febc2e"/><circle cx="82" cy="30" r="7" fill="#28c840"/>'
-            f'<text x="600" y="36" font-family="{MONO}" font-size="16" fill="#8e8e93" text-anchor="middle">{esc(title_text)}</text>')
-    for i, parts in enumerate(lines):
-        if not parts:
-            continue
-        spans = ''.join(f'<tspan fill="{color}">{esc(text)}</tspan>' for text, color in parts)
-        body += (f'<text x="48" y="{60 + 62 + i * 36}" font-family="{MONO}" font-size="20" '
-                 f'xml:space="preserve" style="white-space:pre">{spans}</text>')
-    save(f'{name}.svg', 1200, h, label, defs, body)
-
-
-GRAY, GREEN, WHITE, BLUE, PINK, YELLOW = '#636366', '#30d158', '#f5f5f7', '#64d2ff', '#ff375f', '#ffd60a'
-
-
-def cmd(text, comment=None):
-    parts = [('$ ', GREEN), (text, WHITE)]
-    return parts
-
-
 # ───────────────────────── контакты ─────────────────────────
 
 def contact(name, color, heading, value, glyph):
@@ -206,17 +175,6 @@ C_PLANE = '<path d="M36 62l48-20-10 40-14-10-8 8-2-14z" fill="#ffffff"/>'
 C_PLAY = '<rect x="34" y="44" width="52" height="34" rx="10" fill="#ffffff"/><path d="M54 52v18l15-9z" fill="#d70015"/>'
 C_CAM = ('<rect x="36" y="38" width="48" height="48" rx="14" fill="none" stroke="#ffffff" stroke-width="5"/>'
          '<circle cx="60" cy="62" r="11" fill="none" stroke="#ffffff" stroke-width="5"/><circle cx="74" cy="48" r="3.5" fill="#ffffff"/>')
-
-
-# ───────────────────────── цитата ─────────────────────────
-
-def quote():
-    defs = f'<linearGradient id="ai" x1="0" y1="0" x2="1" y2="0">{AI}</linearGradient>'
-    body = ('<g text-anchor="middle">'
-            '<text x="600" y="64" font-size="40" font-weight="600" fill="#f5f5f7">«Пролить свет знания о пути Пророка</text>'
-            '<text x="600" y="116" font-size="40" font-weight="600" fill="#f5f5f7">и его сподвижников»</text>'
-            '<text x="600" y="160" font-size="22" font-weight="600" fill="#86868b">Цель проекта «Свет Сунны»</text></g>')
-    save('quote.svg', 1200, 190, 'Цель проекта — пролить свет знания о пути Пророка и его сподвижников', defs, body)
 
 
 # ───────────────────────── подвал ─────────────────────────
@@ -239,8 +197,6 @@ def footer():
 banner()
 title('features', 'Возможности', 'Всё, что есть на сайте, — от ленты до автообновления.')
 title('stack', 'Стек', 'Простой Django без лишнего — и деплой на Vercel.')
-title('run', 'Запуск', 'Пять команд — и сайт открыт на localhost.')
-title('structure', 'Структура', 'Где что лежит в репозитории.')
 title('contact', 'Связаться', 'Идеи и поправки — в Telegram.')
 
 row('feed', 'red', G_PLAY, 'Лента видео', 'Уроки с нескольких YouTube-каналов: вкладки по авторам и пагинация', 'YouTube', False)
@@ -259,35 +215,8 @@ stack([
     ('Деплой', ['Vercel', 'Vercel Cron', 'WhiteNoise', 'dj-database-url']),
 ])
 
-terminal('run', 'Запуск сайта в терминале', 'zsh — svet__sunny', [
-    [('# Установка', GRAY)],
-    cmd('python -m venv .venv && source .venv/bin/activate'),
-    cmd('pip install -r requirements.txt'),
-    [],
-    [('# База и админ', GRAY)],
-    cmd('python manage.py migrate'),
-    cmd('python manage.py createsuperuser'),
-    [],
-    [('# Подтянуть видео и запустить', GRAY)],
-    cmd('python manage.py parse_youtube'),
-    cmd('python manage.py runserver'),
-    [('Starting development server at ', BLUE), ('http://127.0.0.1:8000/', BLUE)],
-])
-
-terminal('structure', 'Структура репозитория', 'tree — svet__sunny', [
-    [('main/', BLUE), ('          лента, поиск, команды парсинга', GRAY)],
-    [('  search.py', WHITE), ('    умный поиск по карточкам', GRAY)],
-    [('  sira_data.py', WHITE), ('  треки и вопросы курса по Сире', GRAY)],
-    [('  youtube.py', WHITE), ('    общие функции для YouTube API', GRAY)],
-    [('content/', BLUE), ('       вспомогательное приложение', GRAY)],
-    [('templates/', BLUE), ('     HTML-шаблоны', GRAY)],
-    [('static/', BLUE), ('        CSS и изображения', GRAY)],
-    [('vercel.json', WHITE), ('    деплой и расписание cron', GRAY)],
-])
-
 contact('telegram', 'blue', 'Telegram', '@svettsunny', C_PLANE)
 contact('youtube', 'red', 'YouTube', '@abdurtwhd', C_PLAY)
 contact('instagram', 'violet', 'Instagram', '@abdurtwhd', C_CAM)
 
-quote()
 footer()

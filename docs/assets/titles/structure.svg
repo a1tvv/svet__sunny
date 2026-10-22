@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="130" viewBox="0 0 1200 130" role="img" aria-label="Структура">
-<defs><linearGradient id="ai" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff9f0a"/><stop offset="0.35" stop-color="#ff375f"/><stop offset="0.7" stop-color="#bf5af2"/><stop offset="1" stop-color="#0a84ff"/></linearGradient></defs>
-<g font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
-<text x="2" y="62" font-size="54" font-weight="700" letter-spacing="-1.2" fill="url(#ai)">Структура</text><text x="3" y="104" font-size="25" font-weight="500" fill="#8e8e93">Где что лежит в репозитории.</text>
-</g>
-</svg>

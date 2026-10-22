@@ -10,6 +10,16 @@
 
 <br>
 
+<img src="docs/assets/stats.svg" alt="100 аудиолекций по Сире, 9 частей курса, 26 тестов" width="100%">
+
+<br>
+<br>
+
+<img src="docs/assets/quote.svg" alt="Пролить свет знания о пути Пророка и его сподвижников — цель проекта" width="100%">
+
+<br>
+<br>
+
 <a name="features"></a>
 <img src="docs/assets/titles/features.svg" alt="Возможности" width="100%">
 
@@ -18,10 +28,6 @@
 <a href="main/sira_data.py"><img src="docs/assets/rows/sira.svg" alt="Сира Пророка — аудиолекции по частям и контрольные вопросы" width="100%"></a>
 <a href="vercel.json"><img src="docs/assets/rows/cron.svg" alt="Автообновление — раз в сутки Vercel Cron подтягивает новые видео из RSS" width="100%"></a>
 <a href="main/admin.py"><img src="docs/assets/rows/admin.svg" alt="Админка — ручное управление карточками" width="100%"></a>
-
-<br>
-
-<img src="docs/assets/stats.svg" alt="100 аудиолекций по Сире, 9 частей курса, 26 тестов проходят" width="100%">
 
 <br>
 <br>
@@ -69,6 +75,12 @@ python manage.py runserver
 
 ```bash
 DATABASE_URL=sqlite:///:memory: python manage.py test main
+```
+
+**Пересобрать картинки README**
+
+```bash
+python3 scripts/build_readme_assets.py
 ```
 
 </details>

@@ -1,5 +1,6 @@
 """Пересобирает картинки для README (docs/assets) в стиле iOS.
 
+Русские картинки (README.ru.md) — в docs/assets, английские (README.md) — в docs/assets/en.
 Цифры в плитках считаются сами: лекции и части — из main/sira_data.py, тесты — из main/tests.py.
 Запуск: python3 scripts/build_readme_assets.py
 """
@@ -27,6 +28,12 @@ ICONS = {
     'green': ('#4ade80', '#1e9e47'), 'orange': ('#ffb340', '#d26a00'), 'gray': ('#8e8e93', '#48484a'),
 }
 esc = html.escape
+LANG = 'ru'
+
+
+def tr(ru, en):
+    """Текст на языке, который сейчас собирается."""
+    return ru if LANG == 'ru' else en
 
 
 def save(path, w, h, label, defs, body):
@@ -66,8 +73,9 @@ def banner():
         '<text x="466" y="59.5" font-size="18" font-weight="600" fill="#ffffff">nur-as-sunnah.com</text>'
         '<text x="772" y="59.5" font-size="18" font-weight="600" fill="#30d158" text-anchor="end">online</text>'
         + moon(268, 292, 52, 'url(#aiText)') +
-        '<text x="640" y="318" text-anchor="middle" font-size="112" font-weight="700" letter-spacing="-3" fill="url(#titanium)">Свет Сунны</text>')
-    save('banner.svg', 1200, 600, 'Свет Сунны', defs, body)
+        '<text x="640" y="318" text-anchor="middle" font-size="112" font-weight="700" letter-spacing="-3" fill="url(#titanium)">'
+        + tr('Свет Сунны', 'Svet Sunny') + '</text>')
+    save('banner.svg', 1200, 600, tr('Свет Сунны', 'Svet Sunny'), defs, body)
 
 
 # ───────────────────────── заголовки секций ─────────────────────────
@@ -153,7 +161,7 @@ def stack(groups):
                      f'<text x="{x + w / 2}" y="{y + 33}" font-size="21" font-weight="600" fill="#f5f5f7" text-anchor="middle">{esc(chip)}</text>')
             x += w + 14
         y += 76
-    save('stack.svg', 1200, y - 12, 'Стек: ' + ', '.join(c for _, cs in groups for c in cs), defs, body)
+    save('stack.svg', 1200, y - 12, tr('Стек: ', 'Stack: ') + ', '.join(c for _, cs in groups for c in cs), defs, body)
 
 
 # ───────────────────────── контакты ─────────────────────────
@@ -188,35 +196,58 @@ def footer():
     body = ('<g clip-path="url(#card)"><rect width="1200" height="380" fill="#000000"/><rect width="1200" height="380" fill="url(#spot)"/></g>'
             '<rect x="0.5" y="0.5" width="1199" height="379" rx="31.5" fill="none" stroke="#ffffff" stroke-opacity="0.1"/>'
             '<g font-weight="700" text-anchor="middle">'
-            '<text x="600" y="160" font-size="96" letter-spacing="-3" fill="url(#titanium)">Свет знания.</text>'
-            '<text x="600" y="262" font-size="96" letter-spacing="-3" fill="url(#ai)">Путь сподвижников.</text>'
-            '<text x="600" y="326" font-size="22" font-weight="600" fill="#86868b">Свет Сунны · ١٤٤٧</text></g>')
-    save('footer.svg', 1200, 380, 'Свет знания. Путь сподвижников.', defs, body)
+            f'<text x="600" y="160" font-size="96" letter-spacing="-3" fill="url(#titanium)">{tr("Свет знания.", "Light of knowledge.")}</text>'
+            f'<text x="600" y="262" font-size="96" letter-spacing="-3" fill="url(#ai)">{tr("Путь сподвижников.", "Path of the Companions.")}</text>'
+            f'<text x="600" y="326" font-size="22" font-weight="600" fill="#86868b">{tr("Свет Сунны", "Svet Sunny")} · ١٤٤٧</text></g>')
+    save('footer.svg', 1200, 380, tr('Свет знания. Путь сподвижников.', 'Light of knowledge. Path of the Companions.'), defs, body)
 
 
-banner()
-title('features', 'Возможности', 'Всё, что есть на сайте, — от ленты до автообновления.')
-title('stack', 'Стек', 'Простой Django без лишнего — и деплой на Vercel.')
-title('contact', 'Связаться', 'Идеи и поправки — в Telegram.')
+def build(lang):
+    """Собирает все картинки на одном языке: 'ru' — в docs/assets, 'en' — в docs/assets/en."""
+    global LANG, OUT
+    LANG = lang
+    OUT = os.path.join(ROOT, 'docs', 'assets') if lang == 'ru' else os.path.join(ROOT, 'docs', 'assets', 'en')
 
-row('feed', 'red', G_PLAY, 'Лента видео', 'Уроки с нескольких YouTube-каналов: вкладки по авторам и пагинация', 'YouTube', False)
-row('search', 'blue', G_SEARCH, 'Умный поиск', 'Падежи, опечатки, ё/е, неверная раскладка: cthf → сира', 'search.py')
-row('sira', 'violet', G_WAVE, 'Сира Пророка', 'Аудиолекции по частям и контрольные вопросы к каждой', '100 лекций', False)
-row('cron', 'green', G_CLOCK, 'Автообновление', 'Раз в сутки Vercel Cron подтягивает новые видео из RSS', 'cron', False)
-row('admin', 'orange', G_SLIDERS, 'Админка', 'Ручное управление карточками: порядок, видимость, поиск', '/admin')
+    banner()
+    title('features', tr('Возможности', 'Features'),
+          tr('Всё, что есть на сайте, — от ленты до автообновления.',
+             'Everything on the website — from the video feed to auto updates.'))
+    title('stack', tr('Стек', 'Stack'),
+          tr('Простой Django без лишнего — и деплой на Vercel.', 'Simple Django with nothing extra — and deploy on Vercel.'))
+    title('contact', tr('Связаться', 'Contact'), tr('Идеи и поправки — в Telegram.', 'Send ideas and fixes in Telegram.'))
 
-lectures = sum(len(page['tracks']) for page in SIRA_PAGES)
-tests = len(re.findall(r'^\s+def test_', open(os.path.join(ROOT, 'main', 'tests.py'), encoding='utf-8').read(), re.M))
-stats([(lectures, 'аудиолекций по Сире', ''), (len(SIRA_PAGES), 'частей курса', ''), (tests, 'тестов', '')])
+    row('feed', 'red', G_PLAY, tr('Лента видео', 'Video feed'),
+        tr('Уроки с нескольких YouTube-каналов: вкладки по авторам и пагинация',
+           'Lessons from several YouTube channels: a tab for each author and pages'), 'YouTube', False)
+    row('search', 'blue', G_SEARCH, tr('Умный поиск', 'Smart search'),
+        tr('Падежи, опечатки, ё/е, неверная раскладка: cthf → сира',
+           'Word forms, typos, ё/е, wrong keyboard layout: cthf → сира'), 'search.py')
+    row('sira', 'violet', G_WAVE, tr('Сира Пророка', 'Seerah of the Prophet'),
+        tr('Аудиолекции по частям и контрольные вопросы к каждой', 'Audio lectures in parts, with test questions for each part'),
+        tr('100 лекций', '100 lectures'), False)
+    row('cron', 'green', G_CLOCK, tr('Автообновление', 'Auto update'),
+        tr('Раз в сутки Vercel Cron подтягивает новые видео из RSS', 'Once a day Vercel Cron gets new videos from RSS'), 'cron', False)
+    row('admin', 'orange', G_SLIDERS, tr('Админка', 'Admin panel'),
+        tr('Ручное управление карточками: порядок, видимость, поиск', 'Manage the cards by hand: order, visibility, search'), '/admin')
 
-stack([
-    ('Основной', ['Python', 'Django 5.1', 'SQLite', 'PostgreSQL']),
-    ('Интеграции', ['YouTube RSS', 'YouTube Data API', 'feedparser', 'requests', 'DigitalOcean Spaces']),
-    ('Деплой', ['Vercel', 'Vercel Cron', 'WhiteNoise', 'dj-database-url']),
-])
+    lectures = sum(len(page['tracks']) for page in SIRA_PAGES)
+    tests = len(re.findall(r'^\s+def test_', open(os.path.join(ROOT, 'main', 'tests.py'), encoding='utf-8').read(), re.M))
+    stats([(lectures, tr('аудиолекций по Сире', 'Seerah audio lectures'), ''),
+           (len(SIRA_PAGES), tr('частей курса', 'course parts'), ''), (tests, tr('тестов', 'tests'), '')])
 
-contact('telegram', 'blue', 'Telegram', '@svettsunny', C_PLANE)
-contact('youtube', 'red', 'YouTube', '@abdurtwhd', C_PLAY)
-contact('instagram', 'violet', 'Instagram', '@abdurtwhd', C_CAM)
+    stack([
+        (tr('Основной', 'Main'), ['Python', 'Django 5.1', 'SQLite', 'PostgreSQL']),
+        (tr('Интеграции', 'Integrations'), ['YouTube RSS', 'YouTube Data API', 'feedparser', 'requests', 'DigitalOcean Spaces']),
+        (tr('Деплой', 'Deploy'), ['Vercel', 'Vercel Cron', 'WhiteNoise', 'dj-database-url']),
+    ])
 
-footer()
+    if lang == 'ru':  # в карточках контактов нет русского текста — они общие для обеих версий
+        contact('telegram', 'blue', 'Telegram', '@svettsunny', C_PLANE)
+        contact('youtube', 'red', 'YouTube', '@abdurtwhd', C_PLAY)
+        contact('instagram', 'violet', 'Instagram', '@abdurtwhd', C_CAM)
+
+    footer()
+
+
+build('ru')
+build('en')

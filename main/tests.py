@@ -111,6 +111,26 @@ class IndexViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['page_obj'].number, 1)
 
+    def test_feed_takes_two_queries(self):
+        with self.assertNumQueries(2):  # вкладки с числами + сама страница
+            self.client.get(reverse('index'))
+
+    def test_counts_with_channel_filter(self):
+        make_card('Чужой урок', channel_id='chan2', channel_name='Другой')
+        make_card('Без имени канала', channel_id='chan3', channel_name='')
+        response = self.client.get(reverse('index'), {'channel': 'chan2'})
+        self.assertEqual(response.context['page_obj'].paginator.count, 1)
+        self.assertEqual(response.context['total_count'], 5)
+        self.assertEqual([c['channel_id'] for c in response.context['channels']], ['chan1', 'chan2'])
+
+
+class StaticFilesTests(SimpleTestCase):
+    def test_static_is_cached_on_cdn(self):
+        response = self.client.get('/static/css/style.css')
+        response.close()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Vercel-CDN-Cache-Control'], 'max-age=31536000')
+
 
 class StaticPagesTests(TestCase):
     def test_simple_pages_open(self):

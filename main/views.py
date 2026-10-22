@@ -36,27 +36,32 @@ def index(request):
 
     youtube_cards = Card.objects.filter(card_type='youtube', is_active=True)
 
+    # Один запрос даёт и вкладки авторов, и общее число, и число карточек для пагинации
+    channel_counts = list(
+        youtube_cards.values('channel_id', 'channel_name')
+        .annotate(n=Count('id'))
+        .order_by('-n')
+    )
+    total_count = sum(row['n'] for row in channel_counts)
+
     if query:
         page_obj, query_used = _search_page(query, channel, page_number)
     else:
         query_used = query
         cards = youtube_cards.filter(channel_id=channel) if channel else youtube_cards
-        page_obj = Paginator(cards.order_by('-published', '-id'), CARDS_PER_PAGE).get_page(page_number)
-
-    channels = (
-        youtube_cards.exclude(channel_name='')
-        .values('channel_id', 'channel_name')
-        .annotate(n=Count('id'))
-        .order_by('-n')
-    )
+        paginator = Paginator(cards.order_by('-published', '-id'), CARDS_PER_PAGE)
+        paginator.count = (  # count — cached_property, задаём заранее вместо отдельного COUNT(*)
+            sum(row['n'] for row in channel_counts if row['channel_id'] == channel) if channel else total_count
+        )
+        page_obj = paginator.get_page(page_number)
 
     return render(request, 'index.html', {
         'page_obj': page_obj,
         'q': query,
         'q_used': query_used,
         'selected_channel': channel,
-        'channels': channels,
-        'total_count': youtube_cards.count(),
+        'channels': [row for row in channel_counts if row['channel_name']],
+        'total_count': total_count,
         # query-string без номера страницы, уже экранированный — для ссылок пагинации
         'page_query': urlencode({k: v for k, v in (('q', query), ('channel', channel)) if v}),
         'search_query': urlencode({'q': query}) if query else '',

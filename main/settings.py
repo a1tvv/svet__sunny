@@ -118,10 +118,19 @@ STORAGES = {
 WHITENOISE_USE_FINDERS = True
 WHITENOISE_MANIFEST_STRICT = False
 
+
+def _cache_static_on_vercel_cdn(headers, path, url):
+    """Статику отдаёт CDN Vercel, а не Python-функция. Кэш CDN сбрасывается при каждом деплое."""
+    headers['Vercel-CDN-Cache-Control'] = 'max-age=31536000'
+
+
+WHITENOISE_ADD_HEADERS_FUNCTION = _cache_static_on_vercel_cdn
+
 DATABASES = {
     'default': dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600,
+        conn_health_checks=True,  # Neon усыпляет базу и рвёт соединения — проверяем перед запросом
         ssl_require=ON_VERCEL,
     )
 }

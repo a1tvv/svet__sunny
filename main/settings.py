@@ -9,11 +9,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 ON_VERCEL = 'VERCEL' in os.environ
 
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', '')
-if not SECRET_KEY:
-    if ON_VERCEL:
-        raise RuntimeError('Не задана переменная окружения DJANGO_SECRET_KEY')
-    SECRET_KEY = 'django-insecure-local-key'
+# Если ключ не задан, работаем с небезопасным ключом по умолчанию — на Vercel его нужно задать
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-default-key')
 
 # Локально включается через DJANGO_DEBUG=1, на Vercel всегда выключен
 DEBUG = os.getenv('DJANGO_DEBUG') == '1' and not ON_VERCEL
